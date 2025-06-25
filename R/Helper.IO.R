@@ -1,4 +1,54 @@
 
+### IO
+
+### Any File
+read.pp = function(file, path = "", sep = ",", sep.fasta = "[|]") {
+	if(nchar(path) > 0) {
+		file = paste0(path, "/", file);
+	}
+	if(length(file) > 1) {
+		tmp = lapply(file, read.pp, path = path,
+			sep = sep, sep.fasta = sep.fasta);
+		tmp = do.call(rbind, tmp);
+		return(tmp);
+	}
+	# Read File:
+	isCsv   = grepl("(?i)\\.csv$", file);
+	isFasta = grepl("(?i)\\.fasta$|\\.fa$", file);
+	if(isCsv) {
+		x = read.csv(file);
+	} else if(isFasta) {
+		x = read.fasta2(file, sep = sep.fasta);
+	} else {
+		warning("Not yet implemented!");
+		return(NULL);
+	}
+	x = x[x$hasSeq, c("Seq", "IDP", "Len"), drop = FALSE];
+	names(x)[2] = "Type"; # IDP => Type
+	type  = tolower(x$Type);
+	# TODO: pmatch broken?
+	# type  = pmatch(type, c("positive", "negative"));
+	type  = match(type, c("pos", "neg"))
+	x$Type = strType[type];
+	return(x);
+}
+
+strType = c("Pos", "Neg");
+
+filter.byType = function(flt, data) {
+	x = data;
+	if(flt == "All") {
+		# All
+	} else if(flt == "Positive") {
+		x = x[x$Type == strType[1], ];
+	} else if(flt == "Negative") {
+		x = x[x$Type == strType[2], ];
+	} else {
+		warning("Invalid Filter!");
+	}
+	return(x);
+}
+
 
 ### Read FASTA file
 # - Variant of FASTA: pipe-separated;
