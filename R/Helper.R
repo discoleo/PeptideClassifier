@@ -10,7 +10,7 @@
 ### Digrams of AA
 digrams = function(x, ordered = TRUE) {
 	# aa = LETTERS[1:25];
-	# "B" = "Asx", "Z" = "Glx", "J" = "Xle";
+	# "B" = "Asx", "Z" = "Glx", "J" = "Xle"; "U" = "Se-Cys"
 	# aa = aa[ - c(2, 10)];
 	aa = seq(25)[ - c(2, 10)];
 	a2 = expand.grid(aa, aa);
