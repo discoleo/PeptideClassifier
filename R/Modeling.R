@@ -29,6 +29,7 @@ as.ngram.undirected = function(x, prefix = "_") {
 	if(len == 0) return(x);
 	n  = nchar(x[[1]][1]);
 	aa = LETTERS; len.aa = length(aa);
+	# Bi-Grams
 	if(n == 2) {
 		ngr1 = rep(aa[-len.aa], seq(len.aa-1, 1));
 		id2  = lapply(seq(len.aa - 1), \(LEN) {
@@ -49,4 +50,30 @@ as.ngram.undirected = function(x, prefix = "_") {
 		}
 		return(x);
 	}
+	# 3-Grams
+	if(n == 3) {
+		ngr1 = rep(aa[-len.aa], seq(len.aa-1, 1));
+		id2  = lapply(seq(len.aa - 1), \(LEN) {
+				seq(LEN+1, len.aa);
+			});
+		ngr2 = aa[unlist(id2)];
+		ngrA = paste0(ngr2, ngr1);
+		for(id in seq(len)) {
+			tmp  = x[[id]];
+			str1 = substr(tmp, 1, 1);
+			str3 = substr(tmp, 3, 3);
+			isRev = str3 < str1;
+			str1  = str1[isRev]; str3 = str3[isRev];
+			x[[id]][isRev] = paste0(str3, substr(tmp[isRev], 2, 2), str1);
+		}
+		if(! is.null(prefix)) {
+			for(id in seq(len)) {
+				x[[id]] = paste0(prefix, x[[id]]);
+			}
+		}
+		return(x);
+	}
+	# 4-Grams
+	# NOT yet;
+	warning("Not yet!");
 }
