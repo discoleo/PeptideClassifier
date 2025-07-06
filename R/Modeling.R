@@ -77,3 +77,13 @@ as.ngram.undirected = function(x, prefix = "_") {
 	# NOT yet;
 	warning("Not yet!");
 }
+
+merge.list = function(x, y) {
+	len = length(x);
+	if(length(y) != len) stop("Length Mismatch!");
+	if(len == 0) return(x);
+	tmp = lapply(seq(len), function(id) {
+		c(x[[id]], y[[id]]);
+	});
+	return(tmp);
+}
