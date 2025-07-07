@@ -136,7 +136,7 @@ merge.list = function(x, y) {
 
 #' @export
 dtm = function(x, min.len = 1) {
-	x.str = sapply(xpu, \(x) paste0(x, collapse = " "));
+	x.str = sapply(x, \(x) paste0(x, collapse = " "));
 	tm::DocumentTermMatrix(x.str,
 		control = list(
 			stemming = FALSE, stopwords = FALSE, tolower = FALSE,

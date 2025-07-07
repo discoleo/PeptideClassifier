@@ -74,10 +74,13 @@ panelTopicModel = function() {
 				value = c(6, 40), min = 0, max = 100, step = 1),
 			sliderInput(inputId = "fltTF", label = "TF-IDF",
 				value = 0.1, min = 0, max = 2, step = 0.025),
+			actionButton("btnDTM", "Build DTM"),
+			actionButton("btnDTMFilter", "Filter DTM"),
 		),
 		mainPanel(
 			fluidRow(tag("h1", "Document Term Matrix")),
-			fluidRow(DT::DTOutput("tblDTMSummary"))
+			fluidRow(DT::DTOutput("tblDTMSummary")),
+			fluidRow(DT::DTOutput("tblDTMSummary_Flt")),
 		)
 	)
 }

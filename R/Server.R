@@ -34,6 +34,7 @@ server.app = function(input, output, session) {
 		dfFltData = NULL,   # Data filtered in Table
 		dataDTM   = NULL,   # Filtered Seq-Data for Topic Models
 		dtmData   = NULL,   # DTM
+		dtmFlt    = NULL,   # Filtered DTM
 		reg.Data  = options$reg.Data,
 		fltUnk    = NULL,   # is set automatically
 		fltType   = NULL,
@@ -147,12 +148,34 @@ server.app = function(input, output, session) {
 		values$dtmData = tmp.dtm;
 	})
 	
+	observeEvent(input$btnDTM, {
+		filterSeq();
+	})
 	observeEvent(input$fltLen, {
 		filterSeq();
 	})
 	
+	observeEvent(input$btnDTMFilter, {
+		lim = input$fltTF;
+		dtm = values$dtmData;
+		term_tfidf = tf.idf(dtm);
+		values$dtmFlt = filter.dtm(dtm, term_tfidf, lim = lim);
+	})
+	
+	# Original DTM:
 	output$tblDTMSummary = DT::renderDT({
 		dtm = values$dtmData;
+		if(is.null(dtm)) return();
+		tbl = summary(col_sums(dtm));
+		tbl = data.frame(as.list(tbl), check.names = FALSE);
+		# TODO: 2 columns table?
+		DT::datatable(tbl, options = list(dom = 't')) |>
+			formatRound(names(tbl), 3);
+	})
+	
+	# Filtered DTM:
+	output$tblDTMSummary_Flt = DT::renderDT({
+		dtm = values$dtmFlt;
 		if(is.null(dtm)) return();
 		tbl = summary(col_sums(dtm));
 		tbl = data.frame(as.list(tbl), check.names = FALSE);
