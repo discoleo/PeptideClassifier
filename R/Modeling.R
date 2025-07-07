@@ -87,3 +87,92 @@ merge.list = function(x, y) {
 	});
 	return(tmp);
 }
+
+###################
+###################
+
+#' @export
+dtm = function(x, min.len = 1) {
+	x.str = sapply(xpu, \(x) paste0(x, collapse = " "));
+	tm::DocumentTermMatrix(x.str,
+		control = list(
+			stemming = FALSE, stopwords = FALSE, tolower = FALSE,
+			minWordLength = min.len,
+			removeNumbers = FALSE, removePunctuation = FALSE));
+}
+
+dim.dtm = function(x) {
+	dim(x);
+}
+
+### TF IDF
+tf.idf = function(x) {
+	meanTF = tapply(x$v / row_sums(x)[x$i], x$j, mean);
+	tf_idf = meanTF * log2(tm::nDocs(x) / col_sums(x > 0))
+}
+
+
+### Filter Terms:
+filter.dtm = function(x, tf.idf, lim = 0.1) {
+	x = x[, tf.idf >= lim[1]];
+	x = x[row_sums(x) > 0, ];
+	invisible(x);
+}
+
+###################
+
+### Topic Modelling
+
+
+# data = dtm;
+model.lda = function(data, n, control = NULL, seed = NULL) {
+	control = control.seed(control, seed=seed);
+	topicmodels::LDA(data, k = n, control = control);
+}
+model.lda.fixed = function(data, n, control = NULL, seed = NULL) {
+	if(is.null(control)) control = list();
+	control$estimate.alpha = FALSE;
+	control = control.seed(control, seed=seed);
+	LDA(data, k = n, control = control);
+}
+model.lda.gibbs = function(data, n, iter = 1000, burn.in = 1000, seed = NULL) {
+	control = list(iter = iter, burnin = burn.in, thin = 100);
+	control = control.seed(control, seed = seed);
+	LDA(data, k = n, method = "Gibbs", control = control);
+}
+model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3, seed = NULL) {
+	control = list(var = list(tol = tol.var), em = list(tol = tol.em));
+	control = control.seed(control, seed = seed);
+	CTM(data, k = n, control = control);
+}
+# Demo: Multiple Models
+model.demo = function(data, n, seed = NULL, verbose = TRUE) {
+	resVEM = model.lda(data, n = n, seed = seed);
+	if(verbose) cat("Finished VEM model.\n");
+	fixVEM = model.lda.fixed(data, n = n, seed = seed);
+	if(verbose) cat("Finished fixed VEM model.\n");
+	Gibbs  = model.lda.gibbs(data, n = n, seed = seed);
+	if(verbose) cat("Finished Gibbs model.\n");
+	resCTM = model.ctm(data, n = n, seed = seed);
+	if(verbose) cat("Finished CTM model.\n");
+	#
+	tmp = list(
+		VEM    = resVEM,
+		fixVEM = fixVEM,
+		Gibbs  = Gibbs,
+		CTM    = resCTM );
+	return(tmp);
+}
+
+# Helper:
+control.seed = function(x = NULL, seed = NULL) {
+	if(! is.null(seed)) {
+		if(is.null(x)) {
+			x = list(seed = seed);
+		} else {
+			x$seed = seed;
+		}
+	}
+	return(x);
+}
+
