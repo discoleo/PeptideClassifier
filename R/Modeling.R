@@ -18,7 +18,7 @@ ngrams.demo = function(x,
 	xall = merge.list(xg2u, xg2);
 	# 3-Grams
 	xg3  = ngrams(x, n = 3)
-	xg3u = as.ngram.undirected(xp3, prefix = prefix);
+	xg3u = as.ngram.undirected(xg3, prefix = prefix);
 	if(add.3u) {
 		xall = merge.list(xall, xg3u);
 	}
@@ -27,7 +27,7 @@ ngrams.demo = function(x,
 	}
 	# Length:
 	if(add.length) {
-		xall = merge.list(x.all, as.list(len.pp(xp, breaks = breaks)));
+		xall = merge.list(xall, as.list(len.pp(x, breaks = breaks)));
 	}
 	invisible(xall);
 }
