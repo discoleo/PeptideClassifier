@@ -49,7 +49,12 @@ getUI = function(version = 2) {
 					checkboxInput("chkRegex", "Regex Search: Data", value = TRUE),
 					downloadButton("downloadData", "Download"),
 				),
-				mainPanel(DT::DTOutput("tblData"))
+				mainPanel(
+				fluidRow(DT::DTOutput("tblData")),
+				fluidRow(textOutput("txtDataSummary")),
+				fluidRow(
+					column(4, DT::DTOutput("tblDataSummary")))
+				)
 		)),
 		tabPanel("Clustering", # icon = icon("Clustering"),
 			mainPanel(DT::DTOutput("tblClusters"))
