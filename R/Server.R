@@ -32,6 +32,8 @@ server.app = function(input, output, session) {
 		fullData  = NULL,   # initial Data
 		dfGlData  = NULL,   # Globally filtered Data
 		dfFltData = NULL,   # Data filtered in Table
+		dataDTM   = NULL,   # Filtered Seq-Data for Topic Models
+		dtmData   = NULL,   # DTM
 		reg.Data  = options$reg.Data,
 		fltUnk    = NULL,   # is set automatically
 		fltType   = NULL,
@@ -124,5 +126,38 @@ server.app = function(input, output, session) {
 			return("Data summary: No Data loaded.");
 		}
 		return("Data summary:");
+	})
+	
+	### Modeling: DTM
+	
+	filterSeq = reactive({
+		xdf = values$dfFltData;
+		if(is.null(xdf)) return();
+		# Filter data:
+		print("Filtering Seq for DTM");
+		fltLen = input$fltLen;
+		isData = xdf$Len >= fltLen[1] & xdf$Len <= fltLen[2];
+		xdt = xdf$Seq[isData];
+		### Seq Data:
+		values$dataDTM = xdt;
+		### n-Grams:
+		xgr = ngrams.demo(xdt);
+		### DTM
+		tmp.dtm = dtm(xgr);
+		values$dtmData = tmp.dtm;
+	})
+	
+	observeEvent(input$fltLen, {
+		filterSeq();
+	})
+	
+	output$tblDTMSummary = DT::renderDT({
+		dtm = values$dtmData;
+		if(is.null(dtm)) return();
+		tbl = summary(col_sums(dtm));
+		tbl = data.frame(as.list(tbl), check.names = FALSE);
+		# TODO: 2 columns table?
+		DT::datatable(tbl, options = list(dom = 't')) |>
+			formatRound(names(tbl), 3);
 	})
 }

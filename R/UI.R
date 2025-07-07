@@ -56,8 +56,28 @@ getUI = function(version = 2) {
 					column(4, DT::DTOutput("tblDataSummary")))
 				)
 		)),
+		# Topic Models
+		tabPanel("Modeling", # icon = icon("Modeling"),
+			panelTopicModel()
+		),
 		tabPanel("Clustering", # icon = icon("Clustering"),
 			mainPanel(DT::DTOutput("tblClusters"))
 		),
 	) ) )
+}
+
+
+panelTopicModel = function() {
+	sidebarLayout(
+		sidebarPanel(
+			sliderInput(inputId = "fltLen", label = "Length",
+				value = c(6, 40), min = 0, max = 100, step = 1),
+			sliderInput(inputId = "fltTF", label = "TF-IDF",
+				value = 0.1, min = 0, max = 2, step = 0.025),
+		),
+		mainPanel(
+			fluidRow(tag("h1", "Document Term Matrix")),
+			fluidRow(DT::DTOutput("tblDTMSummary"))
+		)
+	)
 }
