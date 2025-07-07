@@ -1,7 +1,36 @@
 
 
 
+###############
+
+############
+### Data ###
+
 ### Classic n-Grams
+
+# Demo: Compute set of n-Grams
+ngrams.demo = function(x,
+		add.3 = FALSE, add.3u = TRUE, add.length = TRUE,
+		breaks = c(0, 9, 19, 29, 100), prefix = "_") {
+	# nGrams:
+	xg2  = ngrams(x, n = 2);
+	xg2u = as.ngram.undirected(xg2, prefix = prefix);
+	xall = merge.list(xg2u, xg2);
+	# 3-Grams
+	xg3  = ngrams(x, n = 3)
+	xg3u = as.ngram.undirected(xp3, prefix = prefix);
+	if(add.3u) {
+		xall = merge.list(xall, xg3u);
+	}
+	if(add.3) {
+		xall = merge.list(xall, xg3);
+	}
+	# Length:
+	if(add.length) {
+		xall = merge.list(x.all, as.list(len.pp(xp, breaks = breaks)));
+	}
+	invisible(xall);
+}
 
 ngrams = function(x, n = 2, directed = TRUE) {
 	FUN = function(x) {
@@ -78,6 +107,20 @@ as.ngram.undirected = function(x, prefix = "_") {
 	warning("Not yet!");
 }
 
+### Peptide Length
+# Encode Length as n-Gram;
+len.pp = function(x, breaks = c(0, 9, 19, 29, 100),
+		prefix = "", sufix = "L") {
+	len = nchar(x);
+	len = cut(len, breaks = breaks);
+	len = as.numeric(len);
+	len = paste0(prefix, len, sufix);
+	return(len)
+}
+
+
+# Helper:
+
 merge.list = function(x, y) {
 	len = length(x);
 	if(length(y) != len) stop("Length Mismatch!");
@@ -101,9 +144,18 @@ dtm = function(x, min.len = 1) {
 			removeNumbers = FALSE, removePunctuation = FALSE));
 }
 
+#' @export
 dim.dtm = function(x) {
 	dim(x);
 }
+
+#' @export
+freq.term = function(x, data) {
+	id = match(x, data$dimnames$Terms);
+	if(is.na(id)) return(NA);
+	sum(data$j == id);
+}
+
 
 ### TF IDF
 tf.idf = function(x) {
