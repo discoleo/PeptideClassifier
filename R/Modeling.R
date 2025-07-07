@@ -228,3 +228,27 @@ control.seed = function(x = NULL, seed = NULL) {
 	return(x);
 }
 
+##########################
+
+### Analysis
+
+#' @export
+topicSpread = function(x) {
+	spread = apply(posterior(x)$topics, 1, function(z) - sum(z * log(z)));
+	mean(spread);
+}
+
+#' @export
+analyseTerm = function(x, data) {
+	lst = table(topic.term(x, data=data));
+	list(Total = sum(lst), Topics = lst);
+}
+
+#' @export
+topic.term = function(x, data) {
+	id = match(x, data@terms);
+	if(is.na(id)) return(NA);
+	idDoc = data@wordassignments$i[data@wordassignments$j == id];
+	topics(data, 1)[idDoc];
+}
+
