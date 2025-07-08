@@ -35,6 +35,7 @@ server.app = function(input, output, session) {
 		dataDTM   = NULL,   # Filtered Seq-Data for Topic Models
 		dtmData   = NULL,   # DTM
 		dtmFlt    = NULL,   # Filtered DTM
+		tf.idf    = NULL,   # TF-IDF
 		reg.Data  = options$reg.Data,
 		fltUnk    = NULL,   # is set automatically
 		fltType   = NULL,
@@ -154,6 +155,8 @@ server.app = function(input, output, session) {
 		### DTM
 		tmp.dtm = dtm(xgr);
 		values$dtmData = tmp.dtm;
+		values$dtmFlt  = tmp.dtm; # Not yet filtered;
+		values$tf.idf  = tf.idf(tmp.dtm);
 	})
 	
 	observeEvent(input$btnDTM, {
@@ -170,8 +173,9 @@ server.app = function(input, output, session) {
 	observeEvent(input$btnDTMFilter, {
 		lim = input$fltTF;
 		dtm = values$dtmData;
-		term_tfidf = tf.idf(dtm);
-		values$dtmFlt = filter.dtm(dtm, term_tfidf, lim = lim);
+		tfIDF = values$tf.idf;
+		# print(summary(tfIDF));
+		values$dtmFlt = filter.dtm(dtm, tfIDF, lim = lim);
 	})
 	
 	# Original DTM:
@@ -179,10 +183,21 @@ server.app = function(input, output, session) {
 		dtm = values$dtmData;
 		if(is.null(dtm)) return();
 		tbl = summary(col_sums(dtm));
-		tbl = data.frame(as.list(tbl), check.names = FALSE);
-		# TODO: 2 columns table?
+		# tbl = data.frame(as.list(tbl), check.names = FALSE);
+		# Table: in 1 column;
+		tbl = unclass(tbl);
+		tbl = data.frame(Stat = names(tbl), DTM = tbl);
+		tbl = cbind(tbl, "TF.Filtered" = unclass(summary(col_sums(values$dtmFlt))));
+		tbl = cbind(tbl, "TF.IDF" = unclass(summary(values$tf.idf)));
+		rownames(tbl) = NULL;
+		# Dim:
+		dim1 = dim(dtm);
+		dim2 = dim(values$dtmFlt);
+		df2  = data.frame(c("Docs", "Terms"), dim1, dim2, c(0,0));
+		names(df2) = names(tbl);
+		tbl = rbind(tbl, df2, make.row.names = FALSE);
 		DT::datatable(tbl, options = list(dom = 't')) |>
-			formatRound(names(tbl), 3);
+			formatRound(c("DTM", "TF.Filtered", "TF.IDF"), 3);
 	})
 	
 	# Filtered DTM:

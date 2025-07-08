@@ -82,8 +82,10 @@ panelTopicModel = function() {
 			actionButton("btnDTMFilter", "Filter DTM"),
 		),
 		mainPanel(
+			fluidRow(column(7,
 			fluidRow(tag("h1", "Document Term Matrix")),
 			fluidRow(DT::DTOutput("tblDTMSummary")),
+			)),
 			fluidRow(DT::DTOutput("tblDTMSummary_Flt")),
 		)
 	)
