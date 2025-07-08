@@ -1,4 +1,10 @@
-
+#####################
+##
+## Peptide Classifier
+##
+## Leonard Mada
+##
+## draft v.0.1c
 
 
 ###############
@@ -116,6 +122,55 @@ len.pp = function(x, breaks = c(0, 9, 19, 29, 100),
 	len = as.numeric(len);
 	len = paste0(prefix, len, sufix);
 	return(len)
+}
+
+### Charge
+# Compute naive/simple charge of the n-Grams;
+# Note:
+# - is inherently undirected;
+# - for actual charge, use:
+#   ngrams.charge( _SEQ_ , breaks = NULL, prefix = NULL);
+ngrams.charge = function(x, n = 4, breaks = 5, prefix = "+-") {
+	x = lapply(x, function(x) {
+		as.numeric(charToRaw(x)) - 64;
+	});
+	lst = ngrams.charge.numeric(x, n=n, breaks=breaks, prefix=prefix);
+	return(lst);
+}
+ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+-") {
+	x = lapply(x, function(x) {
+		len = length(x);
+		z = rep(0, len);
+		z[x == 4  | x ==  5] = -1;
+		z[x == 11 | x == 18] = 1;
+		# TODO: His;
+		z[1] = z[1] + 1; z[len] = z[len] - 1;
+		if(n == 1) return(z);
+		if(n >= len) return(sum(z));
+		# Proper n-Grams:
+		sapply(seq(len - n + 1), function(npos) {
+			sum(z[seq(npos, npos + n - 1)]);
+		});
+	});
+	if(! is.null(breaks)) {
+		if(length(breaks == 1)) {
+			br = range(unlist(x));
+			dx = diff(br);
+			Ln = breaks + 1;
+			br = seq(br[1], br[2], length.out = Ln);
+			br[1] = br[1] - 1; br[Ln] = br[Ln] + 1;
+			breaks = br;
+		}
+		x = lapply(x, function(x) {
+			as.numeric(cut(x, breaks = breaks));
+		});
+	}
+	if(! is.null(prefix)) {
+		x = lapply(x, function(x) {
+			paste0(prefix, x);
+		});
+	}
+	return(x);
 }
 
 
