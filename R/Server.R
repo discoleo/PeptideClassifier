@@ -39,6 +39,7 @@ server.app = function(input, output, session) {
 		fltUnk    = NULL,   # is set automatically
 		fltType   = NULL,
 		fltCols   = NULL,
+		fltDTMSeq = "Positive",
 		brkLen    = c(0, 9, 19, 29, 39, 100),
 		NULLARG = NULL
 	);
@@ -136,6 +137,13 @@ server.app = function(input, output, session) {
 		if(is.null(xdf)) return();
 		# Filter data:
 		print("Filtering Seq for DTM");
+		fltType = values$fltDTMSeq;
+		if(fltType == 'Positive') {
+			xdf = xdf[xdf$Type == 'Pos', ];
+		} else if(fltType == 'Negative') {
+			xdf = xdf[xdf$Type == 'Neg', ];
+		}
+		# Filter Length:
 		fltLen = input$fltLen;
 		isData = xdf$Len >= fltLen[1] & xdf$Len <= fltLen[2];
 		xdt = xdf$Seq[isData];
@@ -152,6 +160,10 @@ server.app = function(input, output, session) {
 		filterSeq();
 	})
 	observeEvent(input$fltLen, {
+		filterSeq();
+	})
+	observeEvent(input$fltDTMSeq, {
+		values$fltDTMSeq = input$fltDTMSeq;
 		filterSeq();
 	})
 	
