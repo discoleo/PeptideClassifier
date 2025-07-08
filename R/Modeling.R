@@ -107,10 +107,41 @@ as.ngram.undirected = function(x, prefix = "_") {
 			}
 		}
 		return(x);
+	} else if(n == 4) {
+		# 4-Grams
+		lst = as.ngram.u4(x, prefix=prefix);
+		return(lst);
 	}
-	# 4-Grams
 	# NOT yet;
 	warning("Not yet!");
+}
+as.ngram.u4 = function(x, prefix = "_") {
+	len = length(x);
+	if(len == 0) return(x);
+	for(id in seq(len)) {
+		tmp = x[[id]];
+		s1 = substr(tmp, 1, 1); s4 = substr(tmp, 4, 4);
+		s2 = substr(tmp, 2, 2); s3 = substr(tmp, 3, 3);
+		# Case: "BXXA"
+		isRev  = s4 < s1;
+		tmpRev = tmp[isRev];
+		s2 = substr(tmpRev, 2, 2); s3 = substr(tmpRev, 3, 3);
+		x[[id]][isRev] = paste0(s4[isRev], s3, s2, s1[isRev]);
+		# Case: "sBAs", s = same;
+		isRev  = s4 == s1;
+		idRev  = which(isRev);
+		tmpRev = tmp[idRev];
+		s2 = substr(tmpRev, 2, 2); s3 = substr(tmpRev, 3, 3);
+		isRev2 = s3 < s2;
+		idRev  = idRev[isRev2];
+		x[[id]][idRev] = paste0(s4[idRev], s3[isRev2], s2[isRev2], s1[idRev]);
+	}
+	if(! is.null(prefix)) {
+		for(id in seq(len)) {
+			x[[id]] = paste0(prefix, x[[id]]);
+		}
+	}
+	return(x);
 }
 
 ### Peptide Length
@@ -143,7 +174,7 @@ ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+-") {
 		z = rep(0, len);
 		z[x == 4  | x ==  5] = -1;
 		z[x == 11 | x == 18] = 1;
-		# TODO: His;
+		z[x == 8] = 1; # His
 		z[1] = z[1] + 1; z[len] = z[len] - 1;
 		if(n == 1) return(z);
 		if(n >= len) return(sum(z));
