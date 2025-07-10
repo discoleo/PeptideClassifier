@@ -42,6 +42,10 @@ server.app = function(input, output, session) {
 		fltCols   = NULL,
 		fltDTMSeq = "Positive",
 		brkLen    = c(0, 9, 19, 29, 39, 100),
+		# Topic Models
+		nClusters   = 0,
+		seedTopics  = NULL,
+		tmResult    = NULL,
 		NULLARG = NULL
 	);
 	
@@ -200,14 +204,35 @@ server.app = function(input, output, session) {
 			formatRound(c("DTM", "TF.Filtered", "TF.IDF"), 3);
 	})
 	
-	# Filtered DTM:
-	output$tblDTMSummary_Flt = DT::renderDT({
-		dtm = values$dtmFlt;
-		if(is.null(dtm)) return();
-		tbl = summary(col_sums(dtm));
-		tbl = data.frame(as.list(tbl), check.names = FALSE);
-		# TODO: 2 columns table?
-		DT::datatable(tbl, options = list(dom = 't')) |>
-			formatRound(names(tbl), 3);
+	### Clusters / Topics
+	
+	observeEvent(input$numClusters, {
+		values$nClusters = input$numClusters;
+	})
+	
+	observeEvent(input$btnModelTopics, {
+		n = values$nClusters;
+		if(n < 2) return();
+		res.tm = modelTopics(n, dtm = values$dtmFlt);
+		values$tmResult = res.tm;
+	})
+	
+	modelTopics = function(n, dtm) {
+		type = input$fltTMType;
+		SEED = values$seedTopics;
+		lst  = model.byType(n=n, dtm=dtm, SEED = SEED);
+		return(lst);
+	}
+	
+	# Topics:
+	output$tblTopics = DT::renderDT({
+		res.tm = values$tmResult;
+		if(is.null(res.tm)) return();
+		idTopic   = topics(res.tm[[1]], 1);
+		tblTopics = table(idTopic);
+		tblTopics = as.data.frame(tblTopics);
+		print(str(tblTopics))
+		#
+		DT::datatable(tblTopics, options = list(dom = 'tp'));
 	})
 }

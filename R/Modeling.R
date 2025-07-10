@@ -301,6 +301,22 @@ model.demo = function(data, n, seed = NULL, verbose = TRUE) {
 		CTM    = resCTM );
 	return(tmp);
 }
+model.byType = function(n, dtm,
+		type = c("VEM", "fixVEM", "Gibbs", "CTM", "All"),
+		SEED = NULL) {
+	type = match.arg(type);
+	if(type == 'VEM') {
+		list(VEM = model.lda(dtm, n = n, seed = SEED));
+	} else if(type == 'fixVEM') {
+		list(fixVEM = model.lda.fixed(dtm, n = n, seed = SEED));
+	} else if(type == 'Gibbs') {
+		list(Gibbs = model.lda.Gibbs(dtm, n = n, seed = SEED));
+	} else if(type == 'CTM') {
+		list(CTM = model.CTM(dtm, n = n, seed = SEED));
+	} else {
+		model.demo(tmp.dtm, n = n, seed = SEED);
+	}
+}
 
 # Helper:
 control.seed = function(x = NULL, seed = NULL) {
