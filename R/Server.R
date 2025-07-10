@@ -220,7 +220,7 @@ server.app = function(input, output, session) {
 	modelTopics = function(n, dtm) {
 		type = input$fltTMType;
 		SEED = values$seedTopics;
-		lst  = model.byType(n=n, dtm=dtm, SEED = SEED);
+		lst  = model.byType(n=n, dtm=dtm, type=type, SEED = SEED);
 		return(lst);
 	}
 	
@@ -231,6 +231,18 @@ server.app = function(input, output, session) {
 		idTopic   = topics(res.tm[[1]], 1);
 		tblTopics = table(idTopic);
 		tblTopics = as.data.frame(tblTopics);
+		len = length(res.tm);
+		if(len > 1) {
+			# Compact table
+			# Note: direct comparison NOT meaningful;
+			for(id in seq(2, len)) {
+				idTopic = topics(res.tm[[id]], 1);
+				tblTi   = table(idTopic);
+				tblTopics = cbind(tblTopics, as.numeric(tblTi));
+				# names(tblTopics)[id + 1] = names(res.tm)[id];
+			}
+			names(tblTopics) = c("idTopic", names(res.tm));
+		}
 		print(str(tblTopics))
 		#
 		DT::datatable(tblTopics, options = list(dom = 'tp'));

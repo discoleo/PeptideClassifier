@@ -314,7 +314,7 @@ model.byType = function(n, dtm,
 	} else if(type == 'CTM') {
 		list(CTM = model.CTM(dtm, n = n, seed = SEED));
 	} else {
-		model.demo(tmp.dtm, n = n, seed = SEED);
+		model.demo(dtm, n = n, seed = SEED);
 	}
 }
 
