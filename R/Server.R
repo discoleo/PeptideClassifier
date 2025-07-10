@@ -57,6 +57,8 @@ server.app = function(input, output, session) {
 			return(NULL);
 		#
 		x = read.pp(file1$datapath, sep = options$sep);
+		x = cbind(x, charge.pp(x$Seq));
+		x$ChargesN = x$Charged / x$Len;
 		#
 		values$fullData = x;
 	})
@@ -110,10 +112,12 @@ server.app = function(input, output, session) {
 	
 	# Data
 	dataTable = function() {
+		if(is.null(values$dfGlData)) return(NULL);
 		flt = values$fltCols;
 		if(! is.null(flt)) flt = list(searchCols = flt);
 		DT::datatable(values$dfGlData, filter = 'top',
-			options = option.regex(values$reg.Data, varia = flt));
+			options = option.regex(values$reg.Data, varia = flt)) |>
+		formatRound("ChargesN", 2);
 	}
 	
 	output$tblData = DT::renderDT(dataTable())

@@ -58,3 +58,42 @@ table.ngram = function(x) {
 	return(tbl);
 }
 
+####################
+
+### Charge / Charges
+
+charge.pp = function(x) {
+	len = length(x);
+	if(len == 0) {
+		tmp = data.frame(
+			Charge    = numeric(0),
+			ChargedAA = numeric(0));
+		return(tmp);
+	}
+	sSz = nchar(x);
+	tmp = sapply(seq(len), function(id) {
+		szSeq = sSz[[id]];
+		if(szSeq == 0) return(c(0,0));
+		seqAA = x[[id]];
+		totCh = 0; nChAA = 0;
+		for(npos in seq(szSeq)) {
+			ch = substr(seqAA, npos, npos);
+			if(ch == 'D' || ch == 'E') {
+				totCh = totCh - 1; # Total Charge
+				nChAA = nChAA + 1; # Number of Charges
+			} else if(ch == 'H' || ch == 'K' || ch == 'R') {
+				totCh = totCh + 1;
+				nChAA = nChAA + 1;
+			}
+		}
+		return(c(totCh, nChAA));
+	})
+	# Note:
+	# - Terminal charges do NOT matter;
+	# - Cyclo-peptides & C-terminal Amides are not yet covered;
+	tmp = data.frame(
+			Charge    = tmp[1,],
+			ChargedAA = tmp[2,]);
+	invisible(tmp);
+}
+
