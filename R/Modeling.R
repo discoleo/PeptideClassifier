@@ -303,8 +303,19 @@ tf.idf = function(x) {
 ### Filter Terms:
 filter.dtm = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
-	x = x[row_sums(x) > 0, ];
+	idRm = which(row_sums(x) == 0);
+	# Filter out Docs with NO terms left;
+	if(length(idRm) > 0) {
+		x = x[- idRm, ];
+		attr(x, "idDocRm") = idRm;
+	}
 	invisible(x);
+}
+
+# TODO
+which.doc.idf = function(x, tf.idf, lim = 0.1) {
+	isFlt = tf.idf >= lim[1];
+	which(row_sums(x) == 0);
 }
 
 ###################

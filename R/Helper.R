@@ -4,10 +4,22 @@
 ##
 ## Leonard Mada
 ##
-## draft v.0.1a
+## draft v.0.1c
 
+
+### Augment Data
+# - Add Total Charge & Number of Charged AA;
+augment.pp = function(x) {
+	x = cbind(x, charge.pp(x$Seq));
+	x$ChargesN = x$Charged / x$Len;
+	return(x);
+}
+
+
+#################
 
 ### Digrams of AA
+# [Old implementation]
 digrams = function(x, ordered = TRUE) {
 	# aa = LETTERS[1:25];
 	# "B" = "Asx", "Z" = "Glx", "J" = "Xle"; "U" = "Se-Cys"

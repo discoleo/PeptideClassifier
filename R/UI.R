@@ -87,6 +87,11 @@ panelTopicModel = function() {
 			actionButton("btnDTM", "Build DTM"),
 			actionButton("btnDTMFilter", "Filter DTM"),
 			actionButton("btnModelTopics", "Run Model"),
+			# Explore Topics:
+			fluidRow(tag("h3", "Visualise Topics:")),
+			# actionButton("btnVisualise", "Visualise"),
+			textInput("inTopicID", "Topic ID", "1"),
+			
 		),
 		mainPanel(
 			fluidRow(column(7,
@@ -94,10 +99,14 @@ panelTopicModel = function() {
 			fluidRow(DT::DTOutput("tblDTMSummary")),
 			)),
 			fluidRow(tag("h1", "Topics")),
+			fluidRow(
 			column(4,
 			fluidRow(DT::DTOutput("tblTopics")),
 			fluidRow("Note: may take some time to compute the model.")
-			)
+			),
+			column(8, DT::DTOutput("tblTopicInfo")
+			) ),
+			fluidRow(DT::DTOutput("tblPPTopic"))
 		)
 	)
 }

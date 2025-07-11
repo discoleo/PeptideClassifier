@@ -32,6 +32,7 @@ server.app = function(input, output, session) {
 		fullData  = NULL,   # initial Data
 		dfGlData  = NULL,   # Globally filtered Data
 		dfFltData = NULL,   # Data filtered in Table
+		dfDTMData = NULL,   # Filtered Data used for DTM
 		dataDTM   = NULL,   # Filtered Seq-Data for Topic Models
 		dtmData   = NULL,   # DTM
 		dtmFlt    = NULL,   # Filtered DTM
@@ -41,11 +42,14 @@ server.app = function(input, output, session) {
 		fltType   = NULL,
 		fltCols   = NULL,
 		fltDTMSeq = "Positive",
+		idDocRm   = NULL,   # Docs removed following TF-IDF
 		brkLen    = c(0, 9, 19, 29, 39, 100),
 		# Topic Models
 		nClusters   = 0,
 		seedTopics  = NULL,
 		tmResult    = NULL,
+		# Explore / Analyse Topics
+		idTopic     = 1,
 		NULLARG = NULL
 	);
 	
@@ -57,8 +61,7 @@ server.app = function(input, output, session) {
 			return(NULL);
 		#
 		x = read.pp(file1$datapath, sep = options$sep);
-		x = cbind(x, charge.pp(x$Seq));
-		x$ChargesN = x$Charged / x$Len;
+		x = augment.pp(x);
 		#
 		values$fullData = x;
 	})
@@ -139,7 +142,7 @@ server.app = function(input, output, session) {
 		return("Data summary:");
 	})
 	
-	### Modeling: DTM
+	### Modelling: DTM
 	
 	filterSeq = reactive({
 		xdf = values$dfFltData;
@@ -155,8 +158,11 @@ server.app = function(input, output, session) {
 		# Filter Length:
 		fltLen = input$fltLen;
 		isData = xdf$Len >= fltLen[1] & xdf$Len <= fltLen[2];
-		xdt = xdf$Seq[isData];
+		# Filtered Data:
+		xdf = xdf[isData, ];
+		values$dfDTMData = xdf;
 		### Seq Data:
+		xdt = xdf$Seq;
 		values$dataDTM = xdt;
 		### n-Grams:
 		xgr = ngrams.demo(xdt);
@@ -183,7 +189,9 @@ server.app = function(input, output, session) {
 		dtm = values$dtmData;
 		tfIDF = values$tf.idf;
 		# print(summary(tfIDF));
-		values$dtmFlt = filter.dtm(dtm, tfIDF, lim = lim);
+		dtmFlt = filter.dtm(dtm, tfIDF, lim = lim);
+		values$idDocRm = attr(dtmFlt, "idDocRm");
+		values$dtmFlt  = dtmFlt;
 	})
 	
 	# Original DTM:
@@ -228,6 +236,8 @@ server.app = function(input, output, session) {
 		return(lst);
 	}
 	
+	### Explore / Analyse Topics
+	
 	# Topics:
 	output$tblTopics = DT::renderDT({
 		res.tm = values$tmResult;
@@ -250,5 +260,32 @@ server.app = function(input, output, session) {
 		print(str(tblTopics))
 		#
 		DT::datatable(tblTopics, options = list(dom = 'tp'));
+	})
+	
+	# Explore Specific Topic
+	
+	observeEvent(input$inTopicID, {
+		id = round(as.numeric(input$inTopicID));
+		if(is.na(id) || id <= 0 || id > values$nClusters) {
+			warning("Invalid Topic id!");
+			return();
+		}
+		values$idTopic = id;
+	})
+	
+	# PP belonging to specific Topic / Cluster
+	output$tblPPTopic = DT::renderDT({
+		xdf = values$dfDTMData;
+		xtm = values$tmResult;
+		if(is.null(xdf) || is.null(xtm)) return();
+		# Note: Docs could be extracted from the TM-Result as well;
+		idDocRm = values$idDocRm;
+		if(! is.null(idDocRm)) xdf = xdf[- idDocRm, ];
+		id0 = values$idTopic;
+		idTopic = topics(xtm[[1]], 1); # Only Top Topic;
+		tblPP   = xdf[idTopic == id0, ];
+		DT::datatable(tblPP, filter = 'top',
+			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
+		formatRound("ChargesN", 2);
 	})
 }
