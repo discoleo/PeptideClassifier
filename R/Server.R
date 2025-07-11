@@ -37,13 +37,17 @@ server.app = function(input, output, session) {
 		dtmData   = NULL,   # DTM
 		dtmFlt    = NULL,   # Filtered DTM
 		tf.idf    = NULL,   # TF-IDF
+		# Filters:
 		reg.Data  = options$reg.Data,
-		fltUnk    = NULL,   # is set automatically
+		fltUnk    = NULL,   # TODO; is set automatically
 		fltType   = NULL,
 		fltCols   = NULL,
 		fltDTMSeq = "Positive",
+		# Filtering: TF-IDF
+		termsFlt  = NULL,   # Terms removed following TF-IDF
 		idDocRm   = NULL,   # Docs removed following TF-IDF
-		brkLen    = c(0, 9, 19, 29, 39, 100),
+		# Categories:
+		brkLen    = c(0, 9, 19, 29, 39, 100), # PP-Length
 		# Topic Models
 		nClusters   = 0,
 		seedTopics  = NULL,
@@ -187,9 +191,10 @@ server.app = function(input, output, session) {
 	observeEvent(input$btnDTMFilter, {
 		lim = input$fltTF;
 		dtm = values$dtmData;
-		tfIDF = values$tf.idf;
-		# print(summary(tfIDF));
+		# TF-IDF:
+		tfIDF  = values$tf.idf;
 		dtmFlt = filter.dtm(dtm, tfIDF, lim = lim);
+		values$termsFlt = which.term.idf(dtm, tfIDF, lim = lim);
 		values$idDocRm = attr(dtmFlt, "idDocRm");
 		values$dtmFlt  = dtmFlt;
 	})
@@ -219,6 +224,16 @@ server.app = function(input, output, session) {
 				c(1,1,3,1));
 	})
 	
+	# Filtered Terms:
+	output$tblDTMFltTerms = DT::renderDT({
+		xTerms = values$termsFlt; print(xTerms);
+		xdf    = values$dtmData;
+		if(is.null(xTerms) || is.null(xdf)) return();
+		tbl = table.term(xTerms, xdf);
+		DT::datatable(tbl, options = list(dom = 'tip'));
+	})
+	
+	#####################
 	### Clusters / Topics
 	
 	observeEvent(input$numClusters, {

@@ -93,11 +93,15 @@ panelTopicModel = function() {
 			textInput("inTopicID", "Topic ID", "1"),
 			
 		),
+		### Main Panel
 		mainPanel(
 			fluidRow(column(7,
 			fluidRow(tag("h1", "Document Term Matrix")),
 			fluidRow(DT::DTOutput("tblDTMSummary")),
-			)),
+			),
+			column(5, DT::DTOutput("tblDTMFltTerms"))
+			),
+			# Topic Models:
 			fluidRow(tag("h1", "Topics")),
 			fluidRow(
 			column(4,

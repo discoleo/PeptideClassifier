@@ -310,8 +310,8 @@ terms.doc = function(x) {
 ### Filter Terms:
 # Note:
 # - does NOT seem a perfect technique;
-# - Suppose: documents with 16 terms,
-#   one word dominant in 2 clusters out of 6 clusters;
+# - Suppose: N documents each with 16 terms,
+#   one word dominant in 2 clusters out of 6 clusters (of similar size);
 #   => tf.idf = (log2(6) - 1) / 16 = 0.099;
 filter.dtm = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
@@ -339,6 +339,15 @@ table.term.idf = function(x, tf.idf, lim = 0.1, as.df = TRUE) {
 		tbl = as.data.frame(tbl);
 		names(tbl)[1] = "Term";
 	}
+	return(tbl);
+}
+
+table.term = function(term, x) {
+	idT = match(term, x$dimnames$Terms);
+	tbl = table(x$j[x$j %in% idT]);
+	names(tbl) = term;
+	tbl = as.data.frame(tbl);
+	names(tbl)[1] = "Term";
 	return(tbl);
 }
 
