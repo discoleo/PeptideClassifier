@@ -203,17 +203,20 @@ server.app = function(input, output, session) {
 		# Table: in 1 column;
 		tbl = unclass(tbl);
 		tbl = data.frame(Stat = names(tbl), DTM = tbl);
-		tbl = cbind(tbl, "TF.Filtered" = unclass(summary(col_sums(values$dtmFlt))));
+		tbl = cbind(tbl, "DTM.Filtered" = unclass(summary(col_sums(values$dtmFlt))));
 		tbl = cbind(tbl, "TF.IDF" = unclass(summary(values$tf.idf)));
+		tbl = cbind(tbl, "Terms"  = unclass(summary(terms.doc(dtm))));
 		rownames(tbl) = NULL;
 		# Dim:
 		dim1 = dim(dtm);
 		dim2 = dim(values$dtmFlt);
-		df2  = data.frame(c("Docs", "Terms"), dim1, dim2, c(0,0));
+		df2  = data.frame(c("Docs", "Terms"), dim1, dim2,
+			c(0,0), dim1);
 		names(df2) = names(tbl);
 		tbl = rbind(tbl, df2, make.row.names = FALSE);
 		DT::datatable(tbl, options = list(dom = 't')) |>
-			formatRound(c("DTM", "TF.Filtered", "TF.IDF"), 3);
+			formatRound(c("DTM", "DTM.Filtered", "TF.IDF", "Terms"),
+				c(1,1,3,1));
 	})
 	
 	### Clusters / Topics

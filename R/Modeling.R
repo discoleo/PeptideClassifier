@@ -294,13 +294,25 @@ freq.term = function(x, data) {
 
 
 ### TF IDF
+# - Mean(TF.IDF) per all documents;
 tf.idf = function(x) {
 	meanTF = tapply(x$v / row_sums(x)[x$i], x$j, mean);
 	tf_idf = meanTF * log2(tm::nDocs(x) / col_sums(x > 0))
 }
 
+### Retained Terms
+# x = DTM;
+terms.doc = function(x) {
+	tapply(x$v, x$i, sum);
+}
+
 
 ### Filter Terms:
+# Note:
+# - does NOT seem a perfect technique;
+# - Suppose: documents with 16 terms,
+#   one word dominant in 2 clusters out of 6 clusters;
+#   => tf.idf = (log2(6) - 1) / 16 = 0.099;
 filter.dtm = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
 	idRm = which(row_sums(x) == 0);
@@ -312,9 +324,33 @@ filter.dtm = function(x, tf.idf, lim = 0.1) {
 	invisible(x);
 }
 
-# TODO
+table.term.idf = function(x, tf.idf, lim = 0.1, as.df = TRUE) {
+	isFlt = tf.idf < lim[1];
+	ids = which(isFlt);
+	if(length(ids) == 0) {
+		if(as.df) return(data.frame(Term = character(0), Freq = numeric(0)));
+		return(table(numeric(0)));
+	}
+	# x$j == Term id;
+	tbl = table(x$j[x$j %in% ids]);
+	trm = x$dimnames$Terms[which(isFlt)];
+	names(tbl) = trm;
+	if(as.df) {
+		tbl = as.data.frame(tbl);
+		names(tbl)[1] = "Term";
+	}
+	return(tbl);
+}
+
+# Filtered Terms:
+which.term.idf = function(x, tf.idf, lim = 0.1) {
+	isFlt = tf.idf < lim[1];
+	x$dimnames$Terms[which(isFlt)];
+}
+
+# Filtered Docs:
 which.doc.idf = function(x, tf.idf, lim = 0.1) {
-	isFlt = tf.idf >= lim[1];
+	x = x[, tf.idf >= lim[1]];
 	which(row_sums(x) == 0);
 }
 
