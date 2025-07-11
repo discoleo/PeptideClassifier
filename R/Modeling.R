@@ -204,6 +204,56 @@ ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+-") {
 	return(x);
 }
 
+### Charged AA per n-Gram
+# TODO:
+# - test which method is faster: charToRaw vs as.charges;
+ngrams.charged = function(x, n = 4, breaks = 5, prefix = "=") {
+	x = as.charges(x);
+	lst = ngrams.charged.numeric(x, n=n, breaks=breaks, prefix=prefix);
+	return(lst);
+}
+ngrams.charged.numeric = function(x, n = 4, breaks = 5, prefix = "=") {
+	if(length(x) == 0) return(x);
+	lst = lapply(x, function(x) {
+		nch = length(x);
+		if(nch <= n) {
+			chAA = sum(x != 0);
+			return(chAA);
+		}
+		LEN = nch - n + 1;
+		lst = rep(0, LEN);
+		for(npos in seq(LEN)) {
+			lst[npos] = sum(x[seq(npos, npos + n - 1)] != 0)
+		}
+		return(lst);
+	})
+	# TODO: breaks;
+	return(lst);
+}
+
+### Convert to Seq of Charges:
+# Note: N/C-Terminal AA are NOT marked as extra-charged;
+as.charges = function(x) {
+	len = length(x);
+	if(len == 0) return(x);
+	sSz = nchar(x);
+	tmp = lapply(seq(len), function(id) {
+		szSeq = sSz[[id]];
+		if(szSeq == 0) return(numeric(0));
+		seqAA = x[[id]];
+		seqCh = rep(0, szSeq);
+		for(npos in seq(szSeq)) {
+			ch = substr(seqAA, npos, npos);
+			if(ch == 'D' || ch == 'E') {
+				seqCh[npos] = -1;
+			} else if(ch == 'H' || ch == 'K' || ch == 'R') {
+				seqCh[npos] = +1;
+			}
+		}
+		return(seqCh);
+	});
+	return(tmp);
+}
 
 # Helper:
 
