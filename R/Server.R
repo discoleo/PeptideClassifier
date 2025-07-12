@@ -6,8 +6,8 @@ getServer = function(x) {
 server.app = function(input, output, session) {
 	# Global Options
 	options = list(
-		fltUNK    = 0.55, # Default value for Rank-Filter;
-		sep = ",",        # csv Separator
+		fltGlobalLen    = c(6, 60), # Default value for Global Length;
+		sep = ",",         # csv Separator
 		# Regex & Other Options:
 		reg.Data  = TRUE,  # Regex for Data-Table
 		reg.PP    = TRUE,  # Regex for Epitopes-Table
@@ -25,7 +25,8 @@ server.app = function(input, output, session) {
 	);
 	
 	### Init:
-	updateNumericInput(session, "fltUNK", value = options$fltUNK);
+	updateNumericInput(session, "fltGlobalLen",
+		value = options$fltGlobalLen);
 	
 	# Dynamic variable
 	values = reactiveValues(
@@ -38,8 +39,8 @@ server.app = function(input, output, session) {
 		dtmFlt    = NULL,   # Filtered DTM
 		tf.idf    = NULL,   # TF-IDF
 		# Filters:
+		fltGlobalLen  = NULL,   # is set automatically
 		reg.Data  = options$reg.Data,
-		fltUnk    = NULL,   # TODO; is set automatically
 		fltType   = NULL,
 		fltCols   = NULL,
 		fltDTMSeq = "Positive",
@@ -77,6 +78,11 @@ server.app = function(input, output, session) {
 		values$fltType = input$fltType;
 		filter.df();
 	})
+	observeEvent(input$fltGlobalLen, {
+		len = input$fltGlobalLen;
+		values$fltGlobalLen = len;
+		filter.df();
+	})
 	observeEvent(input$chkRegex, {
 		isReg = input$chkRegex;
 		if(values$reg.Data != isReg) {
@@ -92,9 +98,13 @@ server.app = function(input, output, session) {
 	filter.df = function() {
 		# TODO
 		if(is.null(values$fullData)) return();
+		# Type: Positive vs Test PP
 		fltType = values$fltType;
 		x = values$fullData;
 		x = filter.byType(fltType, data = x);
+		# Length (Global Filter)
+		len = values$fltGlobalLen;
+		x = x[x$Len >= len[1] & x$Len <= len[2], ];
 		#
 		values$dfGlData = x;
 		cat("Rows: ", nrow(x), "\n");
@@ -160,7 +170,7 @@ server.app = function(input, output, session) {
 			xdf = xdf[xdf$Type == 'Neg', ];
 		}
 		# Filter Length:
-		fltLen = input$fltLen;
+		fltLen = input$fltDTMLen;
 		isData = xdf$Len >= fltLen[1] & xdf$Len <= fltLen[2];
 		# Filtered Data:
 		xdf = xdf[isData, ];
@@ -180,7 +190,7 @@ server.app = function(input, output, session) {
 	observeEvent(input$btnDTM, {
 		filterSeq();
 	})
-	observeEvent(input$fltLen, {
+	observeEvent(input$fltDTMLen, {
 		filterSeq();
 	})
 	observeEvent(input$fltDTMSeq, {

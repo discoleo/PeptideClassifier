@@ -39,8 +39,9 @@ getUI = function(version = 2) {
 				sidebarPanel(
 					titlePanel("Load file"),
 					fileInput.csv("file", "Select CSV / FASTA file"),
-					sliderInput(inputId = "fltUNK", label = "Not yet",
-						value = 0.2, min = 0, max = 5, step = 0.25),
+					# Note: value is initialised in code;
+					sliderInput(inputId = "fltGlobalLen", label = "Global Length",
+						value = c(6, 60), min = 0, max = 100, step = 1),
 					selectInput("fltType",
 						label = "Filter Activity:",
 						choices = list("All" = "All", "Positive" = "Positive",
@@ -74,7 +75,7 @@ panelTopicModel = function() {
 				label = "Filter sequences:", selected = "Positive",
 				choices = list("All" = "All", "Positive" = "Positive",
 					"Negative" = "Negative") ),
-			sliderInput(inputId = "fltLen", label = "Length",
+			sliderInput(inputId = "fltDTMLen", label = "Length",
 				value = c(6, 40), min = 0, max = 100, step = 1),
 			sliderInput(inputId = "fltTF", label = "TF-IDF",
 				value = 0.1, min = 0, max = 2, step = 0.025),
