@@ -4,7 +4,7 @@
 ##
 ## Leonard Mada
 ##
-## draft v.0.1c
+## draft v.0.1d
 
 
 ###############
@@ -270,6 +270,8 @@ merge.list = function(x, y) {
 ###################
 ###################
 
+### DTM
+
 #' @export
 dtm = function(x, min.len = 1) {
 	x.str = sapply(x, \(x) paste0(x, collapse = " "));
@@ -361,117 +363,5 @@ which.term.idf = function(x, tf.idf, lim = 0.1) {
 which.doc.idf = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
 	which(row_sums(x) == 0);
-}
-
-###################
-
-### Topic Modelling
-
-
-# data = dtm;
-model.lda = function(data, n, control = NULL, seed = NULL) {
-	control = control.seed(control, seed=seed);
-	topicmodels::LDA(data, k = n, control = control);
-}
-model.lda.fixed = function(data, n, control = NULL, seed = NULL) {
-	if(is.null(control)) control = list();
-	control$estimate.alpha = FALSE;
-	control = control.seed(control, seed=seed);
-	LDA(data, k = n, control = control);
-}
-model.lda.gibbs = function(data, n, iter = 1000, burn.in = 1000, seed = NULL) {
-	control = list(iter = iter, burnin = burn.in, thin = 100);
-	control = control.seed(control, seed = seed);
-	LDA(data, k = n, method = "Gibbs", control = control);
-}
-model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3, seed = NULL) {
-	control = list(var = list(tol = tol.var), em = list(tol = tol.em));
-	control = control.seed(control, seed = seed);
-	CTM(data, k = n, control = control);
-}
-# Demo: Multiple Models
-model.demo = function(data, n, seed = NULL, verbose = TRUE) {
-	resVEM = model.lda(data, n = n, seed = seed);
-	if(verbose) cat("Finished VEM model.\n");
-	fixVEM = model.lda.fixed(data, n = n, seed = seed);
-	if(verbose) cat("Finished fixed VEM model.\n");
-	Gibbs  = model.lda.gibbs(data, n = n, seed = seed);
-	if(verbose) cat("Finished Gibbs model.\n");
-	resCTM = model.ctm(data, n = n, seed = seed);
-	if(verbose) cat("Finished CTM model.\n");
-	#
-	tmp = list(
-		VEM    = resVEM,
-		fixVEM = fixVEM,
-		Gibbs  = Gibbs,
-		CTM    = resCTM );
-	return(tmp);
-}
-model.byType = function(n, dtm,
-		type = c("VEM", "fixVEM", "Gibbs", "CTM", "All"),
-		SEED = NULL) {
-	type = match.arg(type);
-	if(type == 'VEM') {
-		list(VEM = model.lda(dtm, n = n, seed = SEED));
-	} else if(type == 'fixVEM') {
-		list(fixVEM = model.lda.fixed(dtm, n = n, seed = SEED));
-	} else if(type == 'Gibbs') {
-		list(Gibbs = model.lda.Gibbs(dtm, n = n, seed = SEED));
-	} else if(type == 'CTM') {
-		list(CTM = model.CTM(dtm, n = n, seed = SEED));
-	} else {
-		model.demo(dtm, n = n, seed = SEED);
-	}
-}
-
-# Helper:
-control.seed = function(x = NULL, seed = NULL) {
-	if(! is.null(seed)) {
-		if(is.null(x)) {
-			x = list(seed = seed);
-		} else {
-			x$seed = seed;
-		}
-	}
-	return(x);
-}
-
-##########################
-
-### Analysis
-
-#' @export
-topicSpread = function(x) {
-	spread = apply(posterior(x)$topics, 1, function(z) - sum(z * log(z)));
-	mean(spread);
-}
-
-#' @export
-analyseTerm = function(x, data) {
-	lst = table(topic.term(x, data=data));
-	list(Total = sum(lst), Topics = lst);
-}
-
-#' @export
-topic.term = function(x, data) {
-	id = match(x, data@terms);
-	if(is.na(id)) return(NA);
-	idDoc = data@wordassignments$i[data@wordassignments$j == id];
-	topics(data, 1)[idDoc];
-}
-
-
-### Topic Separation:
-# Diff between Top 2 topics:
-# Note: gamma = proportion of each topic;
-#' @export
-diffTopics = function(x) {
-	t2 = topics(x, 2);
-	nTop = ncol(x@gamma);
-	nDoc = nrow(x@gamma);
-	id1 = nDoc * (t2[1,] - 1) + seq(nDoc);
-	id2 = nDoc * (t2[2,] - 1) + seq(nDoc);
-	gmd = abs(x@gamma[id1] - x@gamma[id2]);
-	return(gmd);
 }
 
