@@ -37,7 +37,71 @@ ngrams.demo = function(x,
 	}
 	invisible(xall);
 }
+ngrams.select = function(x, type, prefix = c("_", "+", "="),
+		breaks = c(5)) {
+	types = c("2", "2u", "3", "3u", "4", "4u", "Len",
+		"ch3.tot", "ch3.aa", "ch4.tot", "ch4.aa", "ch5.tot", "ch5.aa");
+	iType = match(type, types);
+	isNA  = is.na(iType);
+	if(any(isNA)) warning("Some types are NOT yet implemented: ", type[isNA]);
+	type  = types[iType[! isNA]];
+	# n-Grams:
+	xall  = NULL;
+	isGrS = "2" %in% type; isGrU = "2u" %in% type;
+	if(isGrS || isGrU) {
+		tmp.gr = ngrams(x, n = 2);
+		if(isGrS) xall = merge.list(xall, tmp.gr);
+		if(isGrU) xall = merge.list(xall,
+			as.ngram.undirected(tmp.gr, prefix = prefix[1]));
+	}
+	isGrS = "3" %in% type; isGrU = "3u" %in% type;
+	if(isGrS || isGrU) {
+		tmp.gr = ngrams(x, n = 3);
+		if(isGrS) xall = merge.list(xall, tmp.gr);
+		if(isGrU) xall = merge.list(xall,
+			as.ngram.undirected(tmp.gr, prefix = prefix[1]));
+	}
+	isGrS = "4" %in% type; isGrU = "4u" %in% type;
+	if(isGrS || isGrU) {
+		tmp.gr = ngrams(x, n = 3);
+		if(isGrS) xall = merge.list(xall, tmp.gr);
+		if(isGrU) xall = merge.list(xall,
+			as.ngram.undirected(tmp.gr, prefix = prefix[1]));
+	}
+	# Length of PP:
+	if("Len" %in% type) {
+		tmp.gr = as.list(len.pp(x, breaks = breaks[1]));
+		xall   = merge.list(xall, tmp.gr);
+	}
+	# Charges:
+	isCh = grepl("^ch", type);
+	if(! any(isCh)) return(xall);
+	type = type[isCh];
+	# Total Charge:
+	pp.charge  = as.charges(x);
+	isChargeTt = c("ch3.tot", "ch4.tot", "ch5.tot") %in% type;
+	idChargeTt = which(isChargeTt);
+	if(length(idChargeTt) > 0) {
+		n = c(3,4,5);
+		for(id in idChargeTt) {
+			tmp  = ngrams.charge.numeric(pp.charge, n = n[id], prefix = prefix[2]);
+			xall = merge.list(xall, tmp);
+		}
+	}
+	# Charged AA:
+	isChargeAA = c("ch3.aa", "ch4.aa", "ch5.aa") %in% type;
+	idChargeAA = which(isChargeAA);
+	if(length(idChargeAA) > 0) {
+		n = c(3,4,5);
+		for(id in idChargeAA) {
+			tmp  = ngrams.charged.numeric(pp.charge, n = n[id], prefix = prefix[3]);
+			xall = merge.list(xall, tmp);
+		}
+	}
+	return(xall);
+}
 
+### Simple n-Grams
 ngrams = function(x, n = 2, directed = TRUE) {
 	FUN = function(x) {
 		len = nchar(x);
@@ -59,6 +123,7 @@ ngrams = function(x, n = 2, directed = TRUE) {
 
 ### nGrams: Undirected
 # e.g. "AC" & "CA" => "_AC";
+# Prefix: enables distinction between directed & undirected n-Grams;
 as.ngram.undirected = function(x, prefix = "_") {
 	len = length(x);
 	if(len == 0) return(x);
@@ -161,14 +226,47 @@ len.pp = function(x, breaks = c(0, 9, 19, 29, 100),
 # - is inherently undirected;
 # - for actual charge, use:
 #   ngrams.charge( _SEQ_ , breaks = NULL, prefix = NULL);
-ngrams.charge = function(x, n = 4, breaks = 5, prefix = "+-") {
-	x = lapply(x, function(x) {
-		as.numeric(charToRaw(x)) - 64;
-	});
+ngrams.charge = function(x, n = 4, breaks = 5, prefix = "+") {
+	x   = as.charges(x);
 	lst = ngrams.charge.numeric(x, n=n, breaks=breaks, prefix=prefix);
 	return(lst);
 }
-ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+-") {
+ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+") {
+	if(length(x) == 0) return(x);
+	lst = lapply(x, function(x) {
+		nch  = length(x);
+		# N & C-Terminus:
+		x[1] = x[1] + 1; x[nch] = x[nch] - 1;
+		if(nch <= n) {
+			chAA = sum(x);
+			return(chAA);
+		}
+		LEN = nch - n + 1;
+		lst = rep(0, LEN);
+		for(npos in seq(LEN)) {
+			lst[npos] = sum(x[seq(npos, npos + n - 1)]);
+		}
+		return(lst);
+	})
+	# TODO: breaks;
+	if(! is.null(prefix)) {
+		# n-Gram Length needed to differentiate;
+		prefix = paste0(n, prefix);
+		lst = lapply(lst, function(x) {
+			paste0(prefix, x);
+		});
+	}
+	return(lst);
+}
+ngrams.charge.old = function(x, n = 4, breaks = 5, prefix = "+-") {
+	x = lapply(x, function(x) {
+		as.numeric(charToRaw(x)) - 64;
+	});
+	lst = ngrams.charge.numericChar(x, n=n, breaks=breaks, prefix=prefix);
+	return(lst);
+}
+# [Old approach]
+ngrams.charge.numericChar = function(x, n = 4, breaks = 5, prefix = "+-") {
 	x = lapply(x, function(x) {
 		len = length(x);
 		z = rep(0, len);
@@ -228,6 +326,13 @@ ngrams.charged.numeric = function(x, n = 4, breaks = 5, prefix = "=") {
 		return(lst);
 	})
 	# TODO: breaks;
+	if(! is.null(prefix)) {
+		# n-Gram Length needed to differentiate;
+		prefix = paste0(n, prefix);
+		lst = lapply(lst, function(x) {
+			paste0(prefix, x);
+		});
+	}
 	return(lst);
 }
 
@@ -258,7 +363,9 @@ as.charges = function(x) {
 # Helper:
 
 merge.list = function(x, y) {
+	if(is.null(x)) return(y);
 	len = length(x);
+	if(is.null(y)) return(x);
 	if(length(y) != len) stop("Length Mismatch!");
 	if(len == 0) return(x);
 	tmp = lapply(seq(len), function(id) {
