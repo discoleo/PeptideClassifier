@@ -200,8 +200,25 @@ server.app = function(input, output, session) {
 		filterSeq();
 	})
 	observeEvent(input$btnDTMInspectPP, {
-		id  = 5; # TODO: hardcoded;
 		dtm = values$dtmFlt;
+		if(is.null(dtm)) {
+			output$txtDTM_PP = renderText("Nothing to inspect: no DTM!");
+			output$txtDTM_PP_Terms = NULL;
+			return();
+		}
+		# Doc ID:
+		id = input$fltDTMDocID;
+		id = as.integer(id);
+		if(is.na(id) || id < 1) {
+			warning("Invalid Doc id!");
+			id = 1;
+		}
+		dimDtm = dim.dtm(dtm);
+		if(id > dimDtm[1L]) {
+			warning("Invalid Doc id: beyond last doc!");
+			id = dimDtm[1L];
+		}
+		# Docs & Terms:
 		doc = as.numeric(dtm$dimnames[[1L]][id]);
 		sPP = values$dfDTMData$Seq[doc];
 		sTm = terms.byDoc(id, dtm);

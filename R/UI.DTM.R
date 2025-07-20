@@ -18,6 +18,8 @@ panelDTM = function() {
 			# n-Grams:
 			fluidRow(HTML("&nbsp;")),
 			checkboxNGrams(),
+			# Inspect: Doc ID
+			textInput(inputId = "fltDTMDocID", label = "Inspect Doc", value = "1"),
 		),
 		### Main Panel
 		mainPanel(
