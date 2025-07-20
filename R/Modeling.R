@@ -379,13 +379,16 @@ merge.list = function(x, y) {
 
 ### DTM
 
+# Generate DTM
 #' @export
 dtm = function(x, min.len = 1) {
+	# Skip re-Tokenization: How?
 	x.str = sapply(x, \(x) paste0(x, collapse = " "));
 	tm::DocumentTermMatrix(x.str,
 		control = list(
+			# tokenize = function(x) x,
 			stemming = FALSE, stopwords = FALSE, tolower = FALSE,
-			minWordLength = min.len,
+			wordLengths   = c(min.len, Inf),
 			removeNumbers = FALSE, removePunctuation = FALSE));
 }
 
@@ -413,6 +416,13 @@ tf.idf = function(x) {
 # x = DTM;
 terms.doc = function(x) {
 	tapply(x$v, x$i, sum);
+}
+
+### Terms for document[n];
+# x = DTM;
+terms.byDoc = function(n, x) {
+	# print(x$j[x$i == n]);
+	x$dimnames[[2L]][x$j[x$i == n]];
 }
 
 

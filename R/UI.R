@@ -85,6 +85,7 @@ panelDTM = function() {
 				value = 0.1, min = 0, max = 2, step = 0.025),
 			actionButton("btnDTM", "Build DTM"),
 			actionButton("btnDTMFilter", "Filter DTM"),
+			actionButton("btnDTMInspectPP", "Inspect"),
 			# n-Grams:
 			fluidRow(HTML("&nbsp;")),
 			checkboxGroupInput("chkNGrams", "n-Grams",
@@ -107,6 +108,10 @@ panelDTM = function() {
 			),
 			column(5, DT::DTOutput("tblDTMFltTerms"))
 			),
+			# Inspected PP:
+			fluidRow(HTML("&nbsp;")),
+			fluidRow(textOutput("txtDTM_PP")),
+			fluidRow(textOutput("txtDTM_PP_Terms")),
 		)
 	)
 }

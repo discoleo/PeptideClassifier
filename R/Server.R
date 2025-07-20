@@ -179,7 +179,9 @@ server.app = function(input, output, session) {
 		xdt = xdf$Seq;
 		values$dataDTM = xdt;
 		### n-Grams:
-		xgr = ngrams.demo(xdt);
+		nGr = input$chkNGrams;
+		xgr = ngrams.select(xdt, nGr);
+		# xgr = ngrams.demo(xdt);
 		### DTM
 		tmp.dtm = dtm(xgr);
 		values$dtmData = tmp.dtm;
@@ -196,6 +198,18 @@ server.app = function(input, output, session) {
 	observeEvent(input$fltDTMSeq, {
 		values$fltDTMSeq = input$fltDTMSeq;
 		filterSeq();
+	})
+	observeEvent(input$btnDTMInspectPP, {
+		id  = 5; # TODO: hardcoded;
+		dtm = values$dtmFlt;
+		doc = as.numeric(dtm$dimnames[[1L]][id]);
+		sPP = values$dfDTMData$Seq[doc];
+		sTm = terms.byDoc(id, dtm);
+		sTm = paste(sTm, collapse = " ");
+		# AA-Sequence:
+		sSeq = paste("Inspect:", sPP, collapse = " ");
+		output$txtDTM_PP = renderText(sSeq);
+		output$txtDTM_PP_Terms = renderText(sTm);
 	})
 	
 	observeEvent(input$btnDTMFilter, {
@@ -236,7 +250,7 @@ server.app = function(input, output, session) {
 	
 	# Filtered Terms:
 	output$tblDTMFltTerms = DT::renderDT({
-		xTerms = values$termsFlt; print(xTerms);
+		xTerms = values$termsFlt;
 		xdf    = values$dtmData;
 		if(is.null(xTerms) || is.null(xdf)) return();
 		tbl = table.term(xTerms, xdf);
