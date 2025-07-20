@@ -21,11 +21,11 @@ panelDTM = function() {
 			fluidRow(
 			column(6,
 				# Inspect: Doc ID
-				textInput(inputId = "fltDTMDocID", label = "Inspect Doc",
+				textInput(inputId = "fltDTMDocID", label = "Inspect PP",
 					value = "1", width = 150) ),
 			column(6,
 				# Show Removed Docs:
-				checkboxInput(inputId = "fltDTMDocRem", label = "Show Removed Docs",
+				checkboxInput(inputId = "fltDTMDocRem", label = "Show Removed PPs",
 					value = TRUE) )
 			),
 		),

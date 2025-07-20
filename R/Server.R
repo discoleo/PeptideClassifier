@@ -293,9 +293,9 @@ server.app = function(input, output, session) {
 	output$txtDTM_RemovedDocs = renderText({
 		isDocRm = values$isDocRm;
 		txt = if(isDocRm) {
-			"Removed documents by TF-IDF:";
+			"Removed Polypeptides by TF-IDF:";
 		} else {
-			"Filter TF-IDF: No documents removed."
+			"Filter TF-IDF: No Polypeptides removed."
 		}
 	})
 	

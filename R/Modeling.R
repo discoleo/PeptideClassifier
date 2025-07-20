@@ -253,8 +253,12 @@ ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+") {
 	# TODO: breaks;
 	if(! is.null(prefix)) {
 		# n-Gram Length needed to differentiate;
-		prefix = paste0(n, prefix);
+		isSign  = (prefix == "+"); # Use "+" vs "-";
+		prefixP = paste0(n, prefix);
+		prefixN = paste0(n, "-");
+		prefix  = prefixP;
 		lst = lapply(lst, function(x) {
+			if(isSign) prefix = ifelse(x >= 0, prefixP, prefixN);
 			paste0(prefix, x);
 		});
 	}
