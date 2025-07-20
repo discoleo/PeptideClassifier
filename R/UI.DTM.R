@@ -11,15 +11,23 @@ panelDTM = function() {
 			sliderInput(inputId = "fltDTMLen", label = "Length",
 				value = c(6, 40), min = 0, max = 100, step = 1),
 			sliderInput(inputId = "fltTF", label = "TF-IDF",
-				value = 0.1, min = 0, max = 2, step = 0.025),
+				value = 0.1, min = 0, max = 0.5, step = 0.0125),
 			actionButton("btnDTM", "Build DTM"),
 			actionButton("btnDTMFilter", "Filter DTM"),
 			actionButton("btnDTMInspectPP", "Inspect"),
 			# n-Grams:
 			fluidRow(HTML("&nbsp;")),
 			checkboxNGrams(),
-			# Inspect: Doc ID
-			textInput(inputId = "fltDTMDocID", label = "Inspect Doc", value = "1"),
+			fluidRow(
+			column(6,
+				# Inspect: Doc ID
+				textInput(inputId = "fltDTMDocID", label = "Inspect Doc",
+					value = "1", width = 150) ),
+			column(6,
+				# Show Removed Docs:
+				checkboxInput(inputId = "fltDTMDocRem", label = "Show Removed Docs",
+					value = TRUE) )
+			),
 		),
 		### Main Panel
 		mainPanel(
@@ -33,6 +41,9 @@ panelDTM = function() {
 			fluidRow(HTML("&nbsp;")),
 			fluidRow(textOutput("txtDTM_PP")),
 			fluidRow(textOutput("txtDTM_PP_Terms")),
+			# Removed Docs:
+			fluidRow(textOutput("txtDTM_RemovedDocs")),
+			fluidRow(DT::DTOutput("tblDTMRemovedDocs")),
 		)
 	)
 }

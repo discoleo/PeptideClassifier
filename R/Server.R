@@ -47,6 +47,7 @@ server.app = function(input, output, session) {
 		# Filtering: TF-IDF
 		termsFlt  = NULL,   # Terms removed following TF-IDF
 		idDocRm   = NULL,   # Docs removed following TF-IDF
+		isDocRm   = FALSE,  # Are there any Docs Removed?
 		# Categories:
 		brkLen    = c(0, 9, 19, 29, 39, 100), # PP-Length
 		# Topic Models
@@ -272,6 +273,30 @@ server.app = function(input, output, session) {
 		if(is.null(xTerms) || is.null(xdf)) return();
 		tbl = table.term(xTerms, xdf);
 		DT::datatable(tbl, options = list(dom = 'tip'));
+	})
+	
+	# Removed Docs:
+	output$tblDTMRemovedDocs = DT::renderDT({
+		xdf = values$dfDTMData;
+		idDocs = values$idDocRm;
+		if(is.null(idDocs) || is.null(xdf)) {
+			values$isDocRm = FALSE;
+			return();
+		}
+		xdf = xdf[idDocs, ];
+		values$isDocRm = TRUE;
+		# Table:
+		DT::datatable(xdf, filter = 'top',
+			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
+		formatRound("ChargesN", 2);
+	})
+	output$txtDTM_RemovedDocs = renderText({
+		isDocRm = values$isDocRm;
+		txt = if(isDocRm) {
+			"Removed documents by TF-IDF:";
+		} else {
+			"Filter TF-IDF: No documents removed."
+		}
 	})
 	
 	#####################
