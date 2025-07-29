@@ -355,6 +355,27 @@ server.app = function(input, output, session) {
 		#
 		DT::datatable(tblTopics, options = list(dom = 'tp'));
 	})
+	# Basic Summary:
+	output$tblTopicInfo = DT::renderDT({
+		xtm = values$tmResult;
+		if(is.null(xtm)) return();
+		idTopic = topics(xtm[[1]], 1);
+		idDocs  = as.integer(xtm[[1]]@documents);
+		dfDocs  = values$dfFltData;
+		dfDocs$Topic = 0;
+		dfDocs$Topic[idDocs] = idTopic;
+		dfDocs = dfDocs[dfDocs$Topic > 0, ];
+		tbl = tapply(dfDocs, dfDocs$Topic, function(x) {
+			len = range(x$Len);
+			data.frame(Topic = x$Topic[1], N = nrow(x),
+				Charge    = mean(x$Charge),
+				ChargedAA = mean(x$ChargesN),
+				LMin = len[1], LMax = len[2]);
+			}, simplify = FALSE);
+		tbl = do.call(rbind, tbl);
+		DT::datatable(tbl, options = list(dom = 'tp')) |>
+		formatRound(c("Charge", "ChargedAA"), c(2,2));
+	})
 	
 	### Topic Terms
 	output$tblTopicTerms = DT::renderDT({

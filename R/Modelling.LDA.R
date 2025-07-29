@@ -52,9 +52,9 @@ model.byType = function(n, dtm,
 	} else if(type == 'fixVEM') {
 		list(fixVEM = model.lda.fixed(dtm, n = n, seed = SEED));
 	} else if(type == 'Gibbs') {
-		list(Gibbs = model.lda.Gibbs(dtm, n = n, seed = SEED));
+		list(Gibbs = model.lda.gibbs(dtm, n = n, seed = SEED));
 	} else if(type == 'CTM') {
-		list(CTM = model.CTM(dtm, n = n, seed = SEED));
+		list(CTM = model.ctm(dtm, n = n, seed = SEED));
 	} else {
 		model.demo(dtm, n = n, seed = SEED);
 	}
