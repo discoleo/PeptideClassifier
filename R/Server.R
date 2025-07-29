@@ -245,7 +245,7 @@ server.app = function(input, output, session) {
 		dtm = values$dtmData;
 		# TF-IDF:
 		tfIDF  = values$tf.idf;
-		dtmFlt = filter.dtm(dtm, tfIDF, lim = lim);
+		dtmFlt = filter.idf.dtm(dtm, tfIDF, lim = lim);
 		values$termsFlt = which.term.idf(dtm, tfIDF, lim = lim);
 		values$idDocRm = attr(dtmFlt, "idDocRm");
 		values$dtmFlt  = dtmFlt;

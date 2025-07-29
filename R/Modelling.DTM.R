@@ -90,11 +90,11 @@ terms.byDoc = function(n, x) {
 
 ### Filter Terms:
 # Note:
-# - does NOT seem a perfect technique;
+# - TF-IDF: does NOT seem a perfect technique;
 # - Suppose: N documents each with 16 terms,
 #   one word dominant in 2 clusters out of 6 clusters (of similar size);
 #   => tf.idf = (log2(6) - 1) / 16 = 0.099;
-filter.dtm = function(x, tf.idf, lim = 0.1) {
+filter.idf.dtm = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
 	invisible(filter.docs.dtm(x));
 }
