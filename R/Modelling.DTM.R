@@ -96,6 +96,20 @@ terms.byDoc = function(n, x) {
 #   => tf.idf = (log2(6) - 1) / 16 = 0.099;
 filter.dtm = function(x, tf.idf, lim = 0.1) {
 	x = x[, tf.idf >= lim[1]];
+	invisible(filter.docs.dtm(x));
+}
+
+# Filter DTM by Term Frequency
+filter.freq.dtm = function(x, lim = 1) {
+	if(lim < 1) return(x);
+	tbl = table(x$j);
+	idT = as.integer(names(tbl));
+	isFlt = tbl <= lim;
+	x = x[, ! isFlt];
+	invisible(filter.docs.dtm(x));
+}
+# Filter out Docs with NO terms left;
+filter.docs.dtm = function(x) {
 	idRm = which(row_sums(x) == 0);
 	# Filter out Docs with NO terms left;
 	if(length(idRm) > 0) {

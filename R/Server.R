@@ -44,7 +44,8 @@ server.app = function(input, output, session) {
 		reg.Data  = options$reg.Data,
 		fltType   = NULL,
 		fltCols   = NULL,
-		fltDTMSeq = "Positive",
+		fltDTMSeq  = "Positive",
+		fltDocFreq = 1, # Term Frequency in > Docs;
 		# Filtering: TF-IDF
 		termsFlt  = NULL,   # Terms removed following TF-IDF
 		idDocRm   = NULL,   # Docs removed following TF-IDF
@@ -188,12 +189,15 @@ server.app = function(input, output, session) {
 		values$termsAll = unique(unlist(xgr));
 		### DTM
 		tmp.dtm = dtm(xgr);
+		# Flt: Documents per Term > lim;
+		tmp.dtm = filter.freq.dtm(tmp.dtm, lim = values$fltDocFreq);
 		values$dtmData = tmp.dtm;
 		values$dtmFlt  = tmp.dtm; # Not yet filtered;
 		values$tf.idf  = tf.idf(tmp.dtm);
 		# Excluded Terms:
 		termsEx = setdiff(values$termsAll, tmp.dtm$dimnames[[2L]]);
-		cat("Excluded Terms: "); print(termsEx);
+		cat("Excluded Terms: ", length(termsEx), "\n");
+		# print(termsEx);
 	})
 	
 	observeEvent(input$btnDTM, {
@@ -287,6 +291,7 @@ server.app = function(input, output, session) {
 			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
 		formatRound("ChargesN", 2);
 	})
+	# Title & Messages:
 	output$txtDTM_RemovedDocsTitle = renderText({
 		isDocRm = values$isDocRm;
 		txt = if(isDocRm) {
