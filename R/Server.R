@@ -356,6 +356,16 @@ server.app = function(input, output, session) {
 		DT::datatable(tblTopics, options = list(dom = 'tp'));
 	})
 	
+	### Topic Terms
+	output$tblTopicTerms = DT::renderDT({
+		xtm = values$tmResult;
+		if(is.null(xtm)) return();
+		top = input$numTermsTM;
+		termsT = terms(xtm[[1]], top);
+		termsT = termsT[, seq(values$nClusters)];
+		DT::datatable(termsT, options = list(dom = 'tp'));
+	})
+	
 	# Explore Specific Topic
 	
 	observeEvent(input$inTopicID, {

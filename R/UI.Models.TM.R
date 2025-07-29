@@ -7,15 +7,14 @@ panelTopicModel = function() {
 		sidebarPanel(
 			sliderInput(inputId = "numClusters", label = "Clusters / Topics",
 				value = 6, min = 2, max = 42, step = 1),
-			selectInput("fltTMType",
-				label = "Model type:", selected = "VEM",
-				choices = list("VEM" = "VEM", "fixVEM" = "Fixed VEM",
-					"Gibbs" = "Gibbs", "CTM" = "CTM", "All" = "All") ),
+			selectModel.TM(),
 			actionButton("btnModelTopics", "Run Model"),
 			# Explore Topics:
 			fluidRow(tag("h3", "Visualise Topics:")),
 			# actionButton("btnVisualise", "Visualise"),
 			textInput("inTopicID", "Topic ID", "1"),
+			sliderInput(inputId = "numTermsTM", label = "Display Terms",
+				value = 10, min = 5, max = 45, step = 5),
 		),
 		### Main Panel
 		mainPanel(
@@ -28,7 +27,15 @@ panelTopicModel = function() {
 			),
 			column(8, DT::DTOutput("tblTopicInfo")
 			) ),
-			fluidRow(DT::DTOutput("tblPPTopic"))
+			fluidRow(DT::DTOutput("tblPPTopic")),
+			fluidRow(DT::DTOutput("tblTopicTerms")),
 		)
 	)
+}
+
+selectModel.TM = function(selected = "VEM", id = "fltTMType") {
+	selectInput(id,
+		label = "Model type:", selected = selected,
+		choices = list("VEM" = "VEM", "fixVEM" = "Fixed VEM",
+					"Gibbs" = "Gibbs", "CTM" = "CTM", "All" = "All") );
 }

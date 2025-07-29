@@ -11,7 +11,8 @@ panelDTM = function() {
 			sliderInput(inputId = "fltDTMLen", label = "Length",
 				value = c(6, 40), min = 0, max = 100, step = 1),
 			sliderInput(inputId = "fltTF", label = "TF-IDF",
-				value = 0.1, min = 0, max = 0.5, step = 0.0125),
+				# more conservative value:
+				value = 0.0125, min = 0, max = 0.5, step = 0.0125),
 			actionButton("btnDTM", "Build DTM"),
 			actionButton("btnDTMFilter", "Filter DTM"),
 			actionButton("btnDTMInspectPP", "Inspect"),
