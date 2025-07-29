@@ -13,10 +13,11 @@
 #' @export
 dtm = function(x, min.len = 1) {
 	# Skip re-Tokenization: How?
+	# tokenize.NOP = function(x) x;
 	x.str = sapply(x, \(x) paste0(x, collapse = " "));
 	tm::DocumentTermMatrix(x.str,
 		control = list(
-			# tokenize = function(x) x,
+			# tokenize = tokenize.NOP,
 			stemming = FALSE, stopwords = FALSE, tolower = FALSE,
 			wordLengths   = c(min.len, Inf),
 			removeNumbers = FALSE, removePunctuation = FALSE));
@@ -25,6 +26,29 @@ dtm = function(x, min.len = 1) {
 #' @export
 dim.dtm = function(x) {
 	dim(x);
+}
+
+# x = DTM;
+# dtmFlt = Filtered DTM;
+summary.dtm = function(x, dtmFlt, tf.idf) {
+	# x = dtm;
+	tbl = summary(col_sums(x));
+	# tbl = data.frame(as.list(tbl), check.names = FALSE);
+	# Table: in 1 column;
+	tbl = unclass(tbl);
+	tbl = data.frame(Stat = names(tbl), DTM = tbl);
+	tbl = cbind(tbl, "DTM.Filtered" = unclass(summary(col_sums(dtmFlt))));
+	tbl = cbind(tbl, "TF.IDF" = unclass(summary(tf.idf)));
+	tbl = cbind(tbl, "Terms"  = unclass(summary(terms.doc(x))));
+	rownames(tbl) = NULL;
+	# Dim:
+	dim1 = dim(x);
+	dim2 = dim(dtmFlt);
+	df2  = data.frame(c("Docs", "Terms"), dim1, dim2,
+			c(0,0), dim1);
+	names(df2) = names(tbl);
+	tbl = rbind(tbl, df2, make.row.names = FALSE);
+	return(tbl);
 }
 
 #' @export

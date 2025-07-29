@@ -38,6 +38,7 @@ server.app = function(input, output, session) {
 		dtmData   = NULL,   # DTM
 		dtmFlt    = NULL,   # Filtered DTM
 		tf.idf    = NULL,   # TF-IDF
+		termsAll  = NULL,   # All Terms (non-filtered)
 		# Filters:
 		fltGlobalLen  = NULL,   # is set automatically
 		reg.Data  = options$reg.Data,
@@ -180,14 +181,19 @@ server.app = function(input, output, session) {
 		xdt = xdf$Seq;
 		values$dataDTM = xdt;
 		### n-Grams:
-		nGr = input$chkNGrams;
-		xgr = ngrams.select(xdt, nGr);
+		tGr = input$chkNGrams; # Types of n-Grams;
+		xgr = ngrams.select(xdt, tGr);
 		# xgr = ngrams.demo(xdt);
+		### Terms
+		values$termsAll = unique(unlist(xgr));
 		### DTM
 		tmp.dtm = dtm(xgr);
 		values$dtmData = tmp.dtm;
 		values$dtmFlt  = tmp.dtm; # Not yet filtered;
 		values$tf.idf  = tf.idf(tmp.dtm);
+		# Excluded Terms:
+		termsEx = setdiff(values$termsAll, tmp.dtm$dimnames[[2L]]);
+		cat("Excluded Terms: "); print(termsEx);
 	})
 	
 	observeEvent(input$btnDTM, {
@@ -245,22 +251,8 @@ server.app = function(input, output, session) {
 	output$tblDTMSummary = DT::renderDT({
 		dtm = values$dtmData;
 		if(is.null(dtm)) return();
-		tbl = summary(col_sums(dtm));
-		# tbl = data.frame(as.list(tbl), check.names = FALSE);
-		# Table: in 1 column;
-		tbl = unclass(tbl);
-		tbl = data.frame(Stat = names(tbl), DTM = tbl);
-		tbl = cbind(tbl, "DTM.Filtered" = unclass(summary(col_sums(values$dtmFlt))));
-		tbl = cbind(tbl, "TF.IDF" = unclass(summary(values$tf.idf)));
-		tbl = cbind(tbl, "Terms"  = unclass(summary(terms.doc(dtm))));
-		rownames(tbl) = NULL;
-		# Dim:
-		dim1 = dim(dtm);
-		dim2 = dim(values$dtmFlt);
-		df2  = data.frame(c("Docs", "Terms"), dim1, dim2,
-			c(0,0), dim1);
-		names(df2) = names(tbl);
-		tbl = rbind(tbl, df2, make.row.names = FALSE);
+		# Summary:
+		tbl = summary.dtm(dtm, values$dtmFlt, values$tf.idf);
 		DT::datatable(tbl, options = list(dom = 't')) |>
 			formatRound(c("DTM", "DTM.Filtered", "TF.IDF", "Terms"),
 				c(1,1,3,1));
