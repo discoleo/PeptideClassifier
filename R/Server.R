@@ -245,6 +245,9 @@ server.app = function(input, output, session) {
 		values$termsFlt = which.term.idf(dtm, tfIDF, lim = lim);
 		values$idDocRm = attr(dtmFlt, "idDocRm");
 		values$dtmFlt  = dtmFlt;
+		# Excluded Terms:
+		# trmEx = setdiff(values$termsAll, dtmFlt$dimnames[[2L]]);
+		# cat("Excluded terms: "); print(trmEx);
 	})
 	
 	# Original DTM:
@@ -259,12 +262,14 @@ server.app = function(input, output, session) {
 	})
 	
 	# Filtered Terms:
-	output$tblDTMFltTerms = DT::renderDT({
+	# output$tblDTMFltTerms = DT::renderDT({
+	output$tblDTMRemovedTerms = DT::renderDT({
 		xTerms = values$termsFlt;
 		xdf    = values$dtmData;
 		if(is.null(xTerms) || is.null(xdf)) return();
 		tbl = table.term(xTerms, xdf);
-		DT::datatable(tbl, options = list(dom = 'tip'));
+		DT::datatable(tbl, filter = 'top',
+			options = list(dom = 'tip'));
 	})
 	
 	# Removed Docs:
@@ -282,10 +287,18 @@ server.app = function(input, output, session) {
 			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
 		formatRound("ChargesN", 2);
 	})
-	output$txtDTM_RemovedDocs = renderText({
+	output$txtDTM_RemovedDocsTitle = renderText({
 		isDocRm = values$isDocRm;
 		txt = if(isDocRm) {
 			"Removed Polypeptides by TF-IDF:";
+		} else {
+			NULL;
+		}
+	})
+	output$txtDTM_RemovedDocs = renderText({
+		isDocRm = values$isDocRm;
+		txt = if(isDocRm) {
+			NULL;
 		} else {
 			"Filter TF-IDF: No Polypeptides removed."
 		}

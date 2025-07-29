@@ -9,7 +9,15 @@
 
 ### DTM
 
-# Generate DTM
+### Note:
+# DTM in tm:
+# $i = id Doc;
+# $j = id Term;
+# $v = Term frequency;
+# $dimnames = list(Docs, Terms);
+
+
+### Generate DTM
 #' @export
 dtm = function(x, min.len = 1) {
 	# Skip re-Tokenization: How?
@@ -118,7 +126,8 @@ table.term.idf = function(x, tf.idf, lim = 0.1, as.df = TRUE) {
 table.term = function(term, x) {
 	idT = match(term, x$dimnames$Terms);
 	tbl = table(x$j[x$j %in% idT]);
-	names(tbl) = term;
+	idT = as.numeric(names(tbl));
+	names(tbl) = x$dimnames$Terms[idT];
 	tbl = as.data.frame(tbl);
 	names(tbl)[1] = "Term";
 	return(tbl);
