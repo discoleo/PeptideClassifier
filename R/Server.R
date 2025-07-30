@@ -332,21 +332,17 @@ server.app = function(input, output, session) {
 	
 	### Explore / Analyse Topics
 	
-	# Topics:
-	output$tblTopics = DT::renderDT({
-		res.tm = values$tmResult;
-		if(is.null(res.tm)) return();
-		tblTopics = table.topics(res.tm);
-		print(str(tblTopics))
-		#
-		DT::datatable(tblTopics, options = list(dom = 'tp'));
-	})
-	# Basic Summary:
+	# Topics: Basic Summary:
 	output$tblTopicInfo = DT::renderDT({
 		xtm = values$tmResult;
 		if(is.null(xtm)) return();
 		dfDocs = values$dfFltData;
 		tbl = summary.topics(xtm[[1]], dfDocs);
+		# Multiple Models:
+		if(length(xtm) > 1) {
+			allT = table.topics(xtm);
+			tbl  = cbind(allT, tbl[, -1]);
+		}
 		#
 		DT::datatable(tbl, options = list(dom = 'tp')) |>
 		formatRound(c("Charge", "ChargedAA"), c(2,2));

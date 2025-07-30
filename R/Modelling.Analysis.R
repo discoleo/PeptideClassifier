@@ -48,12 +48,15 @@ table.topics = function(x) {
 	if(len > 1) {
 		# Compact table
 		# Note: direct comparison NOT meaningful;
+		nT = x[[1]]@k;
 		for(id in seq(2, len)) {
 			idTopic = topics(x[[id]], 1);
 			tblTi   = table(idTopic);
+			lenTi   = length(tblTi);
+			if(lenTi < nT) tblTi = c(TblTi, rep(0, nT - lenTi));
 			tblTopics = cbind(tblTopics, as.numeric(tblTi));
 		}
-		names(tblTopics) = c("idTopic", names(x));
+		names(tblTopics) = c("Topic", names(x));
 	}
 	return(tblTopics);
 }
