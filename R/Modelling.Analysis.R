@@ -53,7 +53,7 @@ table.topics = function(x) {
 			idTopic = topics(x[[id]], 1);
 			tblTi   = table(idTopic);
 			lenTi   = length(tblTi);
-			if(lenTi < nT) tblTi = c(TblTi, rep(0, nT - lenTi));
+			if(lenTi < nT) tblTi = c(tblTi, rep(0, nT - lenTi));
 			tblTopics = cbind(tblTopics, as.numeric(tblTi));
 		}
 		names(tblTopics) = c("Topic", names(x));

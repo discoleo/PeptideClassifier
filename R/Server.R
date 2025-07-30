@@ -56,6 +56,7 @@ server.app = function(input, output, session) {
 		nClusters   = 0,
 		seedTopics  = NULL,
 		tmResult    = NULL,
+		idModel     = 1, # when Multiple Models
 		# Explore / Analyse Topics
 		idTopic     = 1,
 		NULLARG = NULL
@@ -336,11 +337,16 @@ server.app = function(input, output, session) {
 	output$tblTopicInfo = DT::renderDT({
 		xtm = values$tmResult;
 		if(is.null(xtm)) return();
+		# Which Model:
+		nMod  = length(xtm);
+		idMod = 1;
+		if(nMod > 1) idMod = min(nMod, values$idModel);
 		dfDocs = values$dfFltData;
-		tbl = summary.topics(xtm[[1]], dfDocs);
+		tbl = summary.topics(xtm[[idMod]], dfDocs);
 		# Multiple Models:
-		if(length(xtm) > 1) {
+		if(nMod > 1) {
 			allT = table.topics(xtm);
+			# TODO
 			tbl  = cbind(allT, tbl[, -1]);
 		}
 		#
@@ -360,6 +366,11 @@ server.app = function(input, output, session) {
 		termsT = terms(xtm[[1]], top);
 		termsT = termsT[, seq(nClusters)];
 		DT::datatable(termsT, options = list(dom = 'tp'));
+	})
+	
+	# Explore Model: Multiple Models
+	observeEvent(input$inModelID, {
+		values$idModel = as.integer(input$inModelID);
 	})
 	
 	# Explore Specific Topic

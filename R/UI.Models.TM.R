@@ -12,7 +12,10 @@ panelTopicModel = function() {
 			# Explore Topics:
 			fluidRow(tag("h3", "Visualise Topics:")),
 			# actionButton("btnVisualise", "Visualise"),
-			textInput("inTopicID", "Topic ID", "1"),
+			fluidRow(
+			column(6, textInput("inModelID", "Model ID", "1", width = 150)),
+			column(6, textInput("inTopicID", "Topic ID", "1", width = 150)),
+			),
 			sliderInput(inputId = "numTermsTM", label = "Display Terms",
 				value = 10, min = 5, max = 45, step = 5),
 		),
