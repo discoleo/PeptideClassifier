@@ -14,6 +14,26 @@ analyseTerm = function(x, data) {
 	list(Total = sum(lst), Topics = lst);
 }
 
+# x    = Topic Model;
+# data = Original Data;
+summary.topics = function(x, data) {
+	idTopic = topics(x, 1);
+	idDocs  = as.integer(x@documents);
+	dfDocs  = data;
+	dfDocs$Topic = 0;
+	dfDocs$Topic[idDocs] = idTopic;
+	dfDocs = dfDocs[dfDocs$Topic > 0, ];
+	tbl = tapply(dfDocs, dfDocs$Topic, function(x) {
+		len = range(x$Len);
+		data.frame(Topic = x$Topic[1], N = nrow(x),
+			Charge    = mean(x$Charge),
+			ChargedAA = mean(x$ChargesN),
+			LMin = len[1], LMax = len[2]);
+	}, simplify = FALSE);
+	tbl = do.call(rbind, tbl);
+	return(tbl);
+}
+
 #' @export
 topic.term = function(x, data) {
 	id = match(x, data@terms);
@@ -28,11 +48,11 @@ topic.term = function(x, data) {
 # Note: gamma = proportion of each topic;
 #' @export
 diffTopics = function(x) {
-	t2 = topics(x, 2);
+	idT  = topics(x, 2);
 	nTop = ncol(x@gamma);
 	nDoc = nrow(x@gamma);
-	id1 = nDoc * (t2[1,] - 1) + seq(nDoc);
-	id2 = nDoc * (t2[2,] - 1) + seq(nDoc);
+	id1 = nDoc * (idT[1,] - 1) + seq(nDoc);
+	id2 = nDoc * (idT[2,] - 1) + seq(nDoc);
 	gmd = abs(x@gamma[id1] - x@gamma[id2]);
 	return(gmd);
 }

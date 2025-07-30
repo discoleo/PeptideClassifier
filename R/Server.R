@@ -359,20 +359,9 @@ server.app = function(input, output, session) {
 	output$tblTopicInfo = DT::renderDT({
 		xtm = values$tmResult;
 		if(is.null(xtm)) return();
-		idTopic = topics(xtm[[1]], 1);
-		idDocs  = as.integer(xtm[[1]]@documents);
-		dfDocs  = values$dfFltData;
-		dfDocs$Topic = 0;
-		dfDocs$Topic[idDocs] = idTopic;
-		dfDocs = dfDocs[dfDocs$Topic > 0, ];
-		tbl = tapply(dfDocs, dfDocs$Topic, function(x) {
-			len = range(x$Len);
-			data.frame(Topic = x$Topic[1], N = nrow(x),
-				Charge    = mean(x$Charge),
-				ChargedAA = mean(x$ChargesN),
-				LMin = len[1], LMax = len[2]);
-			}, simplify = FALSE);
-		tbl = do.call(rbind, tbl);
+		dfDocs = values$dfFltData;
+		tbl = summary.topics(xtm[[1]], dfDocs);
+		#
 		DT::datatable(tbl, options = list(dom = 'tp')) |>
 		formatRound(c("Charge", "ChargedAA"), c(2,2));
 	})
@@ -381,9 +370,13 @@ server.app = function(input, output, session) {
 	output$tblTopicTerms = DT::renderDT({
 		xtm = values$tmResult;
 		if(is.null(xtm)) return();
+		# nClusters has changed: wait for the TM;
+		nClusters = values$nClusters;
+		if(xtm[[1]]@k != nClusters) return();
+		#
 		top = input$numTermsTM;
 		termsT = terms(xtm[[1]], top);
-		termsT = termsT[, seq(values$nClusters)];
+		termsT = termsT[, seq(nClusters)];
 		DT::datatable(termsT, options = list(dom = 'tp'));
 	})
 	
