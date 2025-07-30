@@ -83,3 +83,13 @@ diffTopics = function(x) {
 	gmd = abs(x@gamma[id1] - x@gamma[id2]);
 	return(gmd);
 }
+
+### Utilities
+
+rbind0 = function(x, n = 1, val = 0) {
+	if(n < 1) return(x);
+	for(id in seq(n)) {
+		x = rbind(x, val);
+	}
+	return(x);
+}

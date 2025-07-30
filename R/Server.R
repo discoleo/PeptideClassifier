@@ -346,7 +346,9 @@ server.app = function(input, output, session) {
 		# Multiple Models:
 		if(nMod > 1) {
 			allT = table.topics(xtm);
-			# TODO
+			# CTM: sometimes less clusters;
+			nrM = nrow(tbl); nr.diff = nrow(allT) - nrM;
+			if(nr.diff > 0) tbl = rbind0(tbl, nr.diff);
 			tbl  = cbind(allT, tbl[, -1]);
 		}
 		#
