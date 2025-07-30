@@ -21,11 +21,11 @@ panelTopicModel = function() {
 			# Topic Models:
 			fluidRow(tag("h1", "Topics")),
 			fluidRow(
-			column(4,
+			column(3,
 			fluidRow(DT::DTOutput("tblTopics")),
-			fluidRow("Note: may take some time to compute the model.")
 			),
-			column(8, DT::DTOutput("tblTopicInfo")
+			column(9, DT::DTOutput("tblTopicInfo"),
+			fluidRow("Note: may take some time to compute the model.")
 			) ),
 			fluidRow(DT::DTOutput("tblPPTopic")),
 			fluidRow(DT::DTOutput("tblTopicTerms")),
