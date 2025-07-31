@@ -313,6 +313,12 @@ server.app = function(input, output, session) {
 	#####################
 	### Clusters / Topics
 	
+	getModel = function(nMod, idModel = 1) {
+		idModel = if(nMod > 1) min(nMod, values$idModel)
+			else idModel;
+		return(idModel);
+	}
+	
 	observeEvent(input$numClusters, {
 		values$nClusters = input$numClusters;
 	})
@@ -339,10 +345,9 @@ server.app = function(input, output, session) {
 		if(is.null(xtm)) return();
 		# Which Model:
 		nMod  = length(xtm);
-		idMod = 1;
-		if(nMod > 1) idMod = min(nMod, values$idModel);
-		dfDocs = values$dfFltData;
-		tbl = summary.topics(xtm[[idMod]], dfDocs);
+		idModel = getModel(nMod);
+		dfDocs  = values$dfFltData;
+		tbl = summary.topics(xtm[[idModel]], dfDocs);
 		# Multiple Models:
 		if(nMod > 1) {
 			allT = table.topics(xtm);
@@ -364,8 +369,9 @@ server.app = function(input, output, session) {
 		nClusters = values$nClusters;
 		if(xtm[[1]]@k != nClusters) return();
 		#
+		idModel = getModel(length(xtm));
 		top = input$numTermsTM;
-		termsT = terms(xtm[[1]], top);
+		termsT = terms(xtm[[idModel]], top);
 		termsT = termsT[, seq(nClusters)];
 		DT::datatable(termsT, options = list(dom = 'tp'));
 	})
@@ -395,7 +401,8 @@ server.app = function(input, output, session) {
 		idDocRm = values$idDocRm;
 		if(! is.null(idDocRm)) xdf = xdf[- idDocRm, ];
 		id0 = values$idTopic;
-		idTopic = topics(xtm[[1]], 1); # Only Top Topic;
+		idModel = getModel(length(xtm));
+		idTopic = topics(xtm[[idModel]], 1); # Only Top Topic;
 		tblPP   = xdf[idTopic == id0, ];
 		DT::datatable(tblPP, filter = 'top',
 			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
