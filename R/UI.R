@@ -65,9 +65,22 @@ getUI = function(version = 2) {
 		tabPanel("Topics", # icon = icon("Topics"),
 			panelTopicModel()
 		),
+		# Hierarchical Clustering
 		tabPanel("Clustering", # icon = icon("Clustering"),
-			mainPanel(DT::DTOutput("tblClusters"))
+			panelClustering()
 		),
 	) ) )
+}
+
+
+### Tab: Clustering
+panelClustering = function() {
+	sidebarLayout(
+	sidebarPanel(
+	),
+	mainPanel(
+		plotOutput("imgTree"),
+		DT::DTOutput("tblClusters"),
+	))
 }
 

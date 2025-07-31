@@ -131,7 +131,30 @@ server.app = function(input, output, session) {
 	
 	### Tables
 	
-	# Data
+	buildTable = function(x, filter = 'top', dom = NULL) {
+		# dom = 'tip', 't', 'tp', NULL;
+		if(is.logical(filter)) {
+			filter = if(filter) 'top' else NULL;
+		}
+		hasDom = ! is.null(dom);
+		# DT Table:
+		if(is.null(filter)) {
+			if(hasDom) {
+				DT::datatable(x, options = list(dom = dom));
+			} else {
+				DT::datatable(x);
+			}
+		} else {
+			if(hasDom) {
+				opt = option.regex(values$reg.Data, varia = list(dom = dom));
+			} else {
+				opt = option.regex(values$reg.Data);
+			}
+			DT::datatable(x, filter = filter, options = opt);
+		}
+	}
+	
+	# Table: Primary Data
 	dataTable = function() {
 		if(is.null(values$dfGlData)) return(NULL);
 		flt = values$fltCols;
@@ -266,15 +289,30 @@ server.app = function(input, output, session) {
 				c(1,1,3,1));
 	})
 	
-	# Filtered Terms:
+	# Terms Retained:
+	output$tblDTMRetainedTerms = DT::renderDT({
+		xdf = values$dtmFlt;
+		if(is.null(xdf)) {
+			output$txtTermsRetained = NULL;
+			return();
+		}
+		output$txtTermsRetained = renderText("Terms retained:");
+		tbl = table.terms(xdf);
+		buildTable(tbl, 'top', dom = 'tip');
+	})
+	
+	# Terms Filtered:
 	# output$tblDTMFltTerms = DT::renderDT({
 	output$tblDTMRemovedTerms = DT::renderDT({
 		xTerms = values$termsFlt;
 		xdf    = values$dtmData;
-		if(is.null(xTerms) || is.null(xdf)) return();
+		if(is.null(xTerms) || is.null(xdf)) {
+			output$txtTermsRemoved = NULL;
+			return();
+		}
+		output$txtTermsRemoved = renderText("Terms removed:");
 		tbl = table.term(xTerms, xdf);
-		DT::datatable(tbl, filter = 'top',
-			options = list(dom = 'tip'));
+		buildTable(tbl, 'top', dom = 'tip');
 	})
 	
 	# Removed Docs:
@@ -288,8 +326,7 @@ server.app = function(input, output, session) {
 		xdf = xdf[idDocs, ];
 		values$isDocRm = TRUE;
 		# Table:
-		DT::datatable(xdf, filter = 'top',
-			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
+		buildTable(xdf, 'top', dom = 'tip') |>
 		formatRound("ChargesN", 2);
 	})
 	# Title & Messages:
@@ -407,5 +444,16 @@ server.app = function(input, output, session) {
 		DT::datatable(tblPP, filter = 'top',
 			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
 		formatRound("ChargesN", 2);
+	})
+	
+	### Hierarchical Clustering
+	
+	output$tblClusters = DT::renderDT({
+		xdf = values$dfDTMData;
+		if(is.null(xdf)) return();
+		hClust = hclust(dist(xdf));
+		print(str(hClust));
+		output$imgTree = renderPlot(plot(hClust));
+		return(NULL);
 	})
 }

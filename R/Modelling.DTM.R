@@ -137,6 +137,7 @@ table.term.idf = function(x, tf.idf, lim = 0.1, as.df = TRUE) {
 	return(tbl);
 }
 
+# Frequency: Only terms in "term"
 table.term = function(term, x) {
 	idT = match(term, x$dimnames$Terms);
 	tbl = table(x$j[x$j %in% idT]);
@@ -144,6 +145,17 @@ table.term = function(term, x) {
 	names(tbl) = x$dimnames$Terms[idT];
 	tbl = as.data.frame(tbl);
 	names(tbl)[1] = "Term";
+	tbl$Term = as.character(tbl$Term);
+	return(tbl);
+}
+# Frequency: All Terms
+table.terms = function(x) {
+	tbl = table(x$j);
+	idT = as.numeric(names(tbl));
+	names(tbl) = x$dimnames$Terms[idT];
+	tbl = as.data.frame(tbl);
+	names(tbl)[1] = "Term";
+	tbl$Term = as.character(tbl$Term);
 	return(tbl);
 }
 

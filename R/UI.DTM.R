@@ -47,7 +47,12 @@ panelDTM = function() {
 			fluidRow(textOutput("txtDTM_RemovedDocs")),
 			fluidRow(DT::DTOutput("tblDTMRemovedDocs")),
 			fluidRow(
-			column(6, DT::DTOutput("tblDTMRemovedTerms")),
+			column(6,
+				fluidRow(textOutput("txtTermsRetained")),
+				DT::DTOutput("tblDTMRetainedTerms")),
+			column(6,
+				fluidRow(textOutput("txtTermsRemoved")),
+				DT::DTOutput("tblDTMRemovedTerms")),
 			),
 		)
 	)
