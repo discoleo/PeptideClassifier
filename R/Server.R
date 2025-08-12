@@ -500,9 +500,13 @@ server.app = function(input, output, session) {
 				x^px * y^py / (1 - x^nx*y^ny)^k, 0, 1, rel.tol=tol)$value),
 				0, 1, rel.tol=tol);
 		}
-		resNum = FUN.test();
-		resNum = paste0(c("Value = ", "Error = "),
-			c(resNum$value, resNum$abs.error), ";");
+		resNum = try(FUN.test());
+		if(inherits(resNum, "try-error")) {
+			# 
+		} else {
+			resNum = paste0(c("Value = ", "Error = "),
+				c(resNum$value, resNum$abs.error), ";");
+		}
 		output$txtBetaNumeric = renderText(resNum);
 	})
 }
