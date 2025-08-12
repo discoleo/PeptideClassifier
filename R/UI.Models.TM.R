@@ -18,6 +18,10 @@ panelTopicModel = function() {
 			),
 			sliderInput(inputId = "numTermsTM", label = "Display Terms",
 				value = 10, min = 5, max = 45, step = 5),
+			# LDA-Control:
+			fluidRow(tag("h3", "Model Control:")),
+			sliderInput(inputId = "numTM_Iterations", label = "Max Iterations",
+				value = 1000, min = 500, max = 5000, step = 100),
 		),
 		### Main Panel
 		mainPanel(

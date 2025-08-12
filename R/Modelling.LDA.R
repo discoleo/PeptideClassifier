@@ -20,20 +20,25 @@ model.lda.gibbs = function(data, n, iter = 1000, burn.in = 1000, seed = NULL) {
 	control = control.seed(control, seed = seed);
 	topicmodels::LDA(data, k = n, method = "Gibbs", control = control);
 }
-model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3, seed = NULL) {
-	control = list(var = list(tol = tol.var), em = list(tol = tol.em));
+### Correlated Topic Model
+# tol.em = Tolerance for the EM-algorithm;
+model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3,
+		iter = 500, iter.em = 1000, seed = NULL) {
+	control = list(
+		var = list(tol = tol.var, iter.max = iter),
+		em  = list(tol = tol.em,  iter.max = iter.em));
 	control = control.seed(control, seed = seed);
 	topicmodels::CTM(data, k = n, control = control);
 }
 # Demo: Multiple Models
-model.demo = function(data, n, seed = NULL, verbose = TRUE) {
+model.demo = function(data, n, seed = NULL, verbose = TRUE, ...) {
 	resVEM = model.lda(data, n = n, seed = seed);
 	if(verbose) cat("Finished VEM model.\n");
 	fixVEM = model.lda.fixed(data, n = n, seed = seed);
 	if(verbose) cat("Finished fixed VEM model.\n");
-	Gibbs  = model.lda.gibbs(data, n = n, seed = seed);
+	Gibbs  = model.lda.gibbs(data, n = n, seed = seed, ...);
 	if(verbose) cat("Finished Gibbs model.\n");
-	resCTM = model.ctm(data, n = n, seed = seed);
+	resCTM = model.ctm(data, n = n, seed = seed, ...);
 	if(verbose) cat("Finished CTM model.\n");
 	#
 	tmp = list(
@@ -45,18 +50,18 @@ model.demo = function(data, n, seed = NULL, verbose = TRUE) {
 }
 model.byType = function(n, dtm,
 		type = c("VEM", "fixVEM", "Gibbs", "CTM", "All"),
-		SEED = NULL) {
+		SEED = NULL, ...) {
 	type = match.arg(type);
 	if(type == 'VEM') {
 		list(VEM = model.lda(dtm, n = n, seed = SEED));
 	} else if(type == 'fixVEM') {
 		list(fixVEM = model.lda.fixed(dtm, n = n, seed = SEED));
 	} else if(type == 'Gibbs') {
-		list(Gibbs = model.lda.gibbs(dtm, n = n, seed = SEED));
+		list(Gibbs = model.lda.gibbs(dtm, n = n, seed = SEED, ...));
 	} else if(type == 'CTM') {
-		list(CTM = model.ctm(dtm, n = n, seed = SEED));
+		list(CTM = model.ctm(dtm, n = n, seed = SEED, ...));
 	} else {
-		model.demo(dtm, n = n, seed = SEED);
+		model.demo(dtm, n = n, seed = SEED, ...);
 	}
 }
 

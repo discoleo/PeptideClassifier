@@ -380,7 +380,9 @@ server.app = function(input, output, session) {
 	modelTopics = function(n, dtm) {
 		type = input$fltTMType;
 		SEED = values$seedTopics;
-		lst  = model.byType(n=n, dtm=dtm, type=type, SEED = SEED);
+		iter = as.numeric(input$numTM_Iterations);
+		lst  = model.byType(n=n, dtm=dtm, type=type, SEED = SEED,
+			iter = iter);
 		return(lst);
 	}
 	
