@@ -69,6 +69,10 @@ getUI = function(version = 2) {
 		tabPanel("Clustering", # icon = icon("Clustering"),
 			panelClustering()
 		),
+		# Generalised Beta Distribution
+		tabPanel("Gen.Beta", # icon = icon("BetaDist"),
+			panelBetaDist()
+		),
 	) ) )
 }
 
