@@ -10,6 +10,7 @@ panelTopicModel = function() {
 			selectModel.TM(),
 			actionButton("btnModelTopics", "Run Model"),
 			downloadButton("downloadTMSummary", "Summary"), # Export Summary
+			downloadButton("downloadTMTopics", "Topics"),   # Export Topics
 			# Explore Topics:
 			fluidRow(tag("h3", "Visualise Topics:")),
 			# actionButton("btnVisualise", "Visualise"),

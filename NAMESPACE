@@ -3,6 +3,7 @@
 S3method(dim,dtm)
 export(analyseTerm)
 export(diffTopics)
+export(docTopic)
 export(dtm)
 export(freq.term)
 export(runApp)

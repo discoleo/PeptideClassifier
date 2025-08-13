@@ -22,7 +22,7 @@ model.lda.gibbs = function(data, n, iter = 1000, burn.in = 1000, seed = NULL) {
 }
 ### Correlated Topic Model
 # tol.em = Tolerance for the EM-algorithm;
-model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3,
+model.ctm = function(data, n, tol.var = 10^-5, tol.em = 10^-3,
 		iter = 500, iter.em = 1000, seed = NULL) {
 	control = list(
 		var = list(tol = tol.var, iter.max = iter),

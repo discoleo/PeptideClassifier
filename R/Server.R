@@ -68,6 +68,7 @@ server.app = function(input, output, session) {
 		tmResult    = NULL,  # the TM Models;
 		summaryTM   = NULL,  # Summary of all TMs;
 		idModel     = 1, # when Multiple Models
+		topTopics   = 1, # Download Top Topics
 		# Explore / Analyse Topics
 		idTopic     = 1,
 		NULLARG = NULL
@@ -401,6 +402,20 @@ server.app = function(input, output, session) {
 			x = values$summaryTM;
 			if(is.null(x)) return(NULL);
 			write.csv(x, file, row.names = FALSE);
+		}
+	)
+	
+	output$downloadTMTopics = downloadHandler(
+		filename = function() {
+			n = values$nClusters;
+			type = input$fltTMType;
+			paste("TMTopics.", type, "_", n, ".csv", sep = "");
+		},
+		content = function(file) {
+			x = values$tmResult;
+			if(is.null(x)) return(NULL);
+			xdf = docTopic(x, n = values$topTopics);
+			write.csv(xdf, file, row.names = FALSE);
 		}
 	)
 	

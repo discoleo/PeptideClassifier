@@ -61,12 +61,43 @@ table.topics = function(x) {
 	return(tblTopics);
 }
 
+
+### Topics for given Term
+# Topics of Docs containing given Term;
+# x    = Term;
+# data = TM;
 #' @export
 topic.term = function(x, data) {
 	id = match(x, data@terms);
 	if(is.na(id)) return(NA);
 	idDoc = data@wordassignments$i[data@wordassignments$j == id];
 	topics(data, 1)[idDoc];
+}
+
+
+### Main Topic of each Document
+#' @export
+docTopic = function(x, n = 1) {
+	LEN = length(x);
+	if(LEN == 0) {
+		t0 = data.frame(Doc = numeric(0), Model = numeric(0), T1 = numeric(0));
+		return(t0);
+	}
+	docs = x[[1]]@documents;
+	tDoc = lapply(seq(LEN), function(id) {
+		x = x[[id]];
+		y = topics(x, n);
+		if(n > 1) y = t(y);
+		y = as.data.frame(y);
+		names(y) = paste0("T", seq(n));
+		tDoc  = data.frame(Doc = docs, Model = id);
+		tDoc  = cbind(tDoc, y);
+	})
+	if(LEN > 1) {
+		# Row-format:
+		tDoc = do.call(rbind, tDoc);
+	} else tDoc = tDoc[[1]];
+	return(tDoc);
 }
 
 
