@@ -419,6 +419,7 @@ server.app = function(input, output, session) {
 		}
 	)
 	
+	# Compute TM:
 	modelTopics = function(n, dtm) {
 		type = input$fltTMType;
 		SEED = values$seedTopics;
@@ -496,6 +497,7 @@ server.app = function(input, output, session) {
 		idModel = getModel(length(xtm));
 		idTopic = topics(xtm[[idModel]], 1); # Only Top Topic;
 		tblPP   = xdf[idTopic == id0, ];
+		tblPP$nCov = coverQ(xtm[[idModel]], prob = 0.5, filter = idTopic == id0);
 		DT::datatable(tblPP, filter = 'top',
 			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
 		formatRound("ChargesN", 2);

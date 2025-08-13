@@ -8,6 +8,34 @@ topicSpread = function(x) {
 	mean(spread);
 }
 
+### Document Cover by Topic
+# x = Topic;
+#' @export
+coverTopic = function(x, data) {
+	data@gamma[x];
+}
+
+
+### Cover: Quantile
+# How many Topics are necessary to Cover proportion "prob"?
+# prob   = Quantile to cover;
+# filter = Apply some filtering;
+#' @export
+coverQ = function(x, prob = 0.5, filter = NULL) {
+	pp  = x@gamma;
+	if(! is.null(filter)) pp = pp[filter, ];
+	LEN = nrow(pp); NT = ncol(pp);
+	if(LEN == 0) return();
+	nq = sapply(seq(LEN), function(id) {
+		pp = cumsum(sort(pp[id, ], decreasing = TRUE));
+		for(npos in seq(NT)) {
+			if(pp[npos] >= prob) return(npos);
+		}
+		return(0);
+	})
+	return(nq);
+}
+
 #' @export
 analyseTerm = function(x, data) {
 	lst = table(topic.term(x, data=data));
@@ -27,7 +55,7 @@ summary.topics = function(x, data) {
 	tbl = tapply(dfDocs, dfDocs$Topic, function(x) {
 		len = range(x$Len);
 		LQ2 = median(x$Len);
-		LG3 = sum(x$Len >= LQ3All);
+		LG3 = sum(x$Len >= LQ3All); # >= Q3(Length(All_PP));
 		data.frame(Topic = x$Topic[1], N = nrow(x),
 			Charge    = mean(x$Charge),
 			ChargedAA = mean(x$ChargesN),
@@ -76,6 +104,8 @@ topic.term = function(x, data) {
 
 
 ### Main Topic of each Document
+# n = Top n;
+# x = List of models;
 #' @export
 docTopic = function(x, n = 1) {
 	LEN = length(x);

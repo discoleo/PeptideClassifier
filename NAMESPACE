@@ -2,6 +2,8 @@
 
 S3method(dim,dtm)
 export(analyseTerm)
+export(coverQ)
+export(coverTopic)
 export(diffTopics)
 export(docTopic)
 export(dtm)
