@@ -9,6 +9,7 @@ panelTopicModel = function() {
 				value = 6, min = 2, max = 42, step = 1),
 			selectModel.TM(),
 			actionButton("btnModelTopics", "Run Model"),
+			downloadButton("downloadTMSummary", "Summary"), # Export Summary
 			# Explore Topics:
 			fluidRow(tag("h3", "Visualise Topics:")),
 			# actionButton("btnVisualise", "Visualise"),
@@ -22,6 +23,9 @@ panelTopicModel = function() {
 			fluidRow(tag("h3", "Model Control:")),
 			sliderInput(inputId = "numTM_Iterations", label = "Max Iterations",
 				value = 1000, min = 500, max = 5000, step = 100),
+			fluidRow(
+			column(6, textInput("inTMSeed", "Seed", "0", width = 150)),
+			),
 		),
 		### Main Panel
 		mainPanel(

@@ -65,7 +65,8 @@ server.app = function(input, output, session) {
 		# Topic Models
 		nClusters   = 0,
 		seedTopics  = NULL,
-		tmResult    = NULL,
+		tmResult    = NULL,  # the TM Models;
+		summaryTM   = NULL,  # Summary of all TMs;
 		idModel     = 1, # when Multiple Models
 		# Explore / Analyse Topics
 		idTopic     = 1,
@@ -370,12 +371,38 @@ server.app = function(input, output, session) {
 		values$nClusters = input$numClusters;
 	})
 	
+	observeEvent(input$inTMSeed, {
+		x = input$inTMSeed;
+		if(is.null(x) || nchar(x) == 0) {
+			values$seedTopics = NULL;
+			return();
+		}
+		x = as.integer(x);
+		if(x <= 0) x = NULL;
+		values$seedTopics = x;
+	})
+	
 	observeEvent(input$btnModelTopics, {
 		n = values$nClusters;
 		if(n < 2) return();
+		cat("Started TM:\n");
 		res.tm = modelTopics(n, dtm = values$dtmFlt);
+		cat("Finished TM.\n");
 		values$tmResult = res.tm;
 	})
+	
+	output$downloadTMSummary = downloadHandler(
+		filename = function() {
+			n = values$nClusters;
+			type = input$fltTMType;
+			paste("TMSummary.", type, "_", n, ".csv", sep = "");
+		},
+		content = function(file) {
+			x = values$summaryTM;
+			if(is.null(x)) return(NULL);
+			write.csv(x, file, row.names = FALSE);
+		}
+	)
 	
 	modelTopics = function(n, dtm) {
 		type = input$fltTMType;
@@ -405,6 +432,7 @@ server.app = function(input, output, session) {
 			if(nr.diff > 0) tbl = rbind0(tbl, nr.diff);
 			tbl  = cbind(allT, tbl[, -1]);
 		}
+		values$summaryTM = tbl;
 		#
 		DT::datatable(tbl, options = list(dom = 'tp')) |>
 		formatRound(c("Charge", "ChargedAA"), c(2,2));

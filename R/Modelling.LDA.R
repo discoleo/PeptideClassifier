@@ -32,6 +32,7 @@ model.ctm = function(data, n, tol.var = 10^-4, tol.em = 10^-3,
 }
 # Demo: Multiple Models
 model.demo = function(data, n, seed = NULL, verbose = TRUE, ...) {
+	if(verbose) cat("Starting to compute the Topic Models ...\n");
 	resVEM = model.lda(data, n = n, seed = seed);
 	if(verbose) cat("Finished VEM model.\n");
 	fixVEM = model.lda.fixed(data, n = n, seed = seed);
