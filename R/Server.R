@@ -414,10 +414,28 @@ server.app = function(input, output, session) {
 		content = function(file) {
 			x = values$tmResult;
 			if(is.null(x)) return(NULL);
-			xdf = docTopic(x, n = values$topTopics);
+			# Top Topics:
+			n = values$topTopics;
+			if(n == 0) n = values$nClusters;
+			xdf = docTopic(x, n = n);
 			write.csv(xdf, file, row.names = FALSE);
 		}
 	)
+	
+	observeEvent(input$inTMDownloadTop, {
+		x = input$inTMDownloadTop;
+		if(is.null(x) || nchar(x) == 0) {
+			x = 1;
+		} else {
+			x = as.integer(x);
+			if(is.na(x)) { x = 1; }
+			else if(x < 0) {
+				x = values$nClusters + x;
+				if(x < 0) x = 0;
+			}
+		}
+		values$topTopics = x;
+	})
 	
 	# Compute TM:
 	modelTopics = function(n, dtm) {

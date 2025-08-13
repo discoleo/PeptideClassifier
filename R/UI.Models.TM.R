@@ -22,11 +22,12 @@ panelTopicModel = function() {
 				value = 10, min = 5, max = 45, step = 5),
 			# LDA-Control:
 			fluidRow(tag("h3", "Model Control:")),
-			sliderInput(inputId = "numTM_Iterations", label = "Max Iterations",
-				value = 1000, min = 500, max = 5000, step = 100),
 			fluidRow(
 			column(6, textInput("inTMSeed", "Seed", "0", width = 150)),
+			column(6, textInput("inTMDownloadTop", "Download Topics", "1", width = 150)),
 			),
+			sliderInput(inputId = "numTM_Iterations", label = "Max Iterations",
+				value = 1000, min = 500, max = 5000, step = 100),
 		),
 		### Main Panel
 		mainPanel(
