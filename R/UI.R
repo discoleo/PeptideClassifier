@@ -81,10 +81,22 @@ getUI = function(version = 2) {
 panelClustering = function() {
 	sidebarLayout(
 	sidebarPanel(
+	h3("Subtree:"),
+	fluidRow(
+	column(4, textInput("txtSubTree_Node", "Node/Peptide", "")),
+	column(4, textInput("txtSubTree_Size", "Size", "20")),
+	),
+	actionButton("btnSubtree", "SubTree"),
+	actionButton("btnSubT_Details", "Peptides"),
+	# SubTree Data:
+	downloadButton("downloadSubT_Data", "Data"),
 	),
 	mainPanel(
 		plotOutput("imgTree"),
 		DT::DTOutput("tblClusters"),
-	))
+		plotOutput("imgSubTree"),
+		DT::DTOutput("tblSubTree"),
+	)
+	)
 }
 

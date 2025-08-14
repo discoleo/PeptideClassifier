@@ -22,10 +22,9 @@ server.app = function(input, output, session) {
 		reg.Data  = TRUE,  # Regex for Data-Table
 		reg.PP    = TRUE,  # Regex for Epitopes-Table
 		highlight = TRUE,  # Highlight Search Term
+		# Topic Models:
+		seedTM    = NULL,  # Seed: 123
 		# TODO
-		# Protein Graph:
-		col.Pr    = "#FF0032A0",
-		border.Pr = "#640000A0",
 		NULL
 	);
 	
@@ -34,9 +33,16 @@ server.app = function(input, output, session) {
 		NULL
 	);
 	
+	asChar = function(x) {
+		if(is.null(x)) return("");
+		return(as.character(x));
+	}
+	
 	### Init:
 	updateNumericInput(session, "fltGlobalLen",
 		value = options$fltGlobalLen);
+	updateNumericInput(session, "inTMSeed",
+		value = asChar(options$seedTM));
 	
 	# Dynamic variable
 	values = reactiveValues(
@@ -64,13 +70,16 @@ server.app = function(input, output, session) {
 		brkLen    = c(0, 9, 19, 29, 39, 100), # PP-Length
 		# Topic Models
 		nClusters   = 0,
-		seedTopics  = NULL,
+		seedTM      = NULL,  # Seed for TMs;
 		tmResult    = NULL,  # the TM Models;
 		summaryTM   = NULL,  # Summary of all TMs;
 		idModel     = 1, # when Multiple Models
 		topTopics   = 1, # Download Top Topics
 		# Explore / Analyse Topics
 		idTopic     = 1,
+		# Hierarchical Clusters
+		clustResult  = NULL,
+		clustSubTree = NULL,
 		NULLARG = NULL
 	);
 	
@@ -375,12 +384,12 @@ server.app = function(input, output, session) {
 	observeEvent(input$inTMSeed, {
 		x = input$inTMSeed;
 		if(is.null(x) || nchar(x) == 0) {
-			values$seedTopics = NULL;
+			values$seedTM = NULL;
 			return();
 		}
 		x = as.integer(x);
 		if(x <= 0) x = NULL;
-		values$seedTopics = x;
+		values$seedTM = x;
 	})
 	
 	observeEvent(input$btnModelTopics, {
@@ -440,7 +449,7 @@ server.app = function(input, output, session) {
 	# Compute TM:
 	modelTopics = function(n, dtm) {
 		type = input$fltTMType;
-		SEED = values$seedTopics;
+		SEED = values$seedTM;
 		iter = as.numeric(input$numTM_Iterations);
 		lst  = model.byType(n=n, dtm=dtm, type=type, SEED = SEED,
 			iter = iter);
@@ -524,13 +533,77 @@ server.app = function(input, output, session) {
 	### Hierarchical Clustering
 	
 	output$tblClusters = DT::renderDT({
+		# Based on DTM-Data!
+		# - which is a filtered version of values$dfFltData;
 		xdf = values$dfDTMData;
 		if(is.null(xdf)) return();
 		hClust = hclust(dist(xdf));
+		values$clustResult = hClust;
 		print(str(hClust));
 		output$imgTree = renderPlot(plot(hClust));
 		return(NULL);
 	})
+	
+	### Extract SubTree:
+	observeEvent(input$btnSubtree, {
+		resetST = function() values$clustSubTree = NULL;
+		x = values$clustResult;
+		if(is.null(x)) { resetST(); return(); }
+		# Include Leaf:
+		node = input$txtSubTree_Node;
+		node = as.integer(node);
+		if(is.na(node) || node == 0) { resetST(); return(); }
+		if(node > 0) {
+			node = match(node, x$labels);
+			if(is.na(node)) { resetST(); return(); }
+		}
+		# Size
+		size = input$txtSubTree_Size;
+		size = as.integer(size);
+		if(is.na(size) || size == 0) { resetST(); return(); }
+		subT = subtree.nc(node, n = size, x);
+		values$clustSubTree = subT;
+	})
+	
+	# Plot SubTree:
+	output$imgSubTree = renderPlot({
+		x = values$clustSubTree;
+		if(is.null(x)) return();
+		plot(x);
+	});
+	
+	readFromTree = function() {
+		x = values$clustSubTree;
+		if(is.null(x)) return(NULL);
+		ids = as.numeric(x$labels);
+		# TODO: check if Data-source correct!
+		dfx = values$dfFltData;
+		dfx = dfx[ids, ];
+	}
+	
+	# SubTree: PP Details
+	observeEvent(input$btnSubT_Details, {
+		x = readFromTree();
+		if(is.null(x)) return();
+		output$tblSubTree = DT::renderDT({
+			DT::datatable(x, filter = 'top',
+				options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
+			formatRound("ChargesN", 2);
+		});
+	})
+	
+	# SubTree: Save Data
+	output$downloadSubT_Data = downloadHandler(
+		filename = function() {
+			node = input$txtSubTree_Node;
+			paste("Data.SubTree.P", node, ".csv", sep = "");
+		},
+		content = function(file) {
+			x = readFromTree();
+			if(is.null(x)) return();
+			write.csv(x, file, row.names = FALSE);
+		}
+	)
 	
 	### Generalised Beta Distribution
 	
