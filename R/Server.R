@@ -543,7 +543,10 @@ server.app = function(input, output, session) {
 		hClust = hclust(dist(xdf), method = type);
 		values$clustResult = hClust;
 		print(str(hClust));
-		output$imgTree = renderPlot(plot(hClust));
+		# Plot:
+		orientH = input$fltTreePlotOrientation;
+		hClust  = as.dendrogram(hClust);
+		output$imgTree = renderPlot(plot(hClust, horiz = orientH));
 		return(NULL);
 	})
 	

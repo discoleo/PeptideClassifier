@@ -12,13 +12,16 @@
 
 
 ### Tab: Clustering
-panelClustering = function() {
+panelClustering = function(img.height = 800) {
+	hImg = if(is.character(img.height)) img.height
+		else paste0(img.height, "px");
+	# UI:
 	sidebarLayout(
 	sidebarPanel(
 	h3("Subtree:"),
 	fluidRow(
 	column(4, textInput("txtSubTree_Node", "Node/Peptide", "")),
-	column(4, textInput("txtSubTree_Size", "Size", "20")),
+	column(4, textInput("txtSubTree_Size", "Size", "50")),
 	),
 	actionButton("btnSubtree", "SubTree"),
 	actionButton("btnSubT_Details", "Peptides"),
@@ -27,16 +30,24 @@ panelClustering = function() {
 	fluidRow(HTML("&nbsp;")),
 	fluidRow(
 	column(6, selectClusterType()),
-	column(6,)
+	# Plot Orientation:
+	column(6, selectClusterPlotOrientation())
 	),
 	),
 	mainPanel(
-		plotOutput("imgTree"),
+		plotOutput("imgTree", height = hImg),
 		DT::DTOutput("tblClusters"),
 		plotOutput("imgSubTree"),
 		DT::DTOutput("tblSubTree"),
 	)
 	)
+}
+
+selectClusterPlotOrientation = function(selected = TRUE, id = "fltTreePlotOrientation") {
+	selectInput(id, label = "Plot orientation:",
+		choices = list(
+			"Horizontal" = TRUE,  "Vertical" = FALSE),
+		selected = selected);
 }
 
 selectClusterType = function(selected = "complete", id = "fltTreeType") {
