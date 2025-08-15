@@ -80,6 +80,8 @@ server.app = function(input, output, session) {
 		# Hierarchical Clusters
 		clustResult  = NULL,
 		clustSubTree = NULL,
+		# Clustering: Diagnostics
+		corClusters  = NULL,
 		# Maths
 		optMath = list(tol = 1E-13),
 		NULLARG = NULL
@@ -610,6 +612,51 @@ server.app = function(input, output, session) {
 			write.csv(x, file, row.names = FALSE);
 		}
 	)
+	
+	### Clustering: Diagnostics
+	
+	observeEvent(input$btnTreeCor, {
+		xdf = values$dfDTMData;
+		if(is.null(xdf)) return();
+		# Required Packages:
+		pkgs = c("dendextend", "corrplot");
+		if(!(require(pkgs[1], character.only = TRUE) &
+			require(pkgs[2], character.only = TRUE))) {
+			return();
+		}
+		# Clustering: All Methods
+		d = dist(xdf);
+		clustMethods = c("ward.D", "single", "complete", "average",
+			"mcquitty", "median", "centroid", "ward.D2");
+		lstClust = dendlist();
+		for(i in seq_along(clustMethods)) {
+			clustX   = hclust(d, method = clustMethods[i]);
+			lstClust = dendlist(lstClust, as.dendrogram(clustX));
+		}
+		names(lstClust) = clustMethods;
+		cat("Finished Clustering!\n");
+		cat("Starting cor.dendlist: this takes time!\n");
+		### Correlations:
+		corClusters = cor.dendlist(lstClust);
+		values$corClusters = corClusters;
+	})
+	
+	output$imgTreeCor = renderPlot({
+		x = values$corClusters;
+		if(is.null(x)) return();
+		if(! require("corrplot", character.only = TRUE)) {
+			return();
+		}
+		typeCor  = input$fltDxCorTypes;
+		orderCor = input$fltDxCorOrder;
+		# Plot:
+		corrplot::corrplot(x, method = typeCor, type = "lower",
+			order = orderCor);
+	})
+	
+	output$txtTreeDx_Warn = renderText({
+		return("Warning: Takes quite some time to compute!");
+	})
 	
 	### Generalised Beta Distribution
 	
