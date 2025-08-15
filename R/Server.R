@@ -641,6 +641,7 @@ server.app = function(input, output, session) {
 		values$corClusters = corClusters;
 	})
 	
+	# Plot: Correlations between Trees
 	output$imgTreeCor = renderPlot({
 		x = values$corClusters;
 		if(is.null(x)) return();
@@ -654,8 +655,27 @@ server.app = function(input, output, session) {
 			order = orderCor);
 	})
 	
+	# Messages:
 	output$txtTreeDx_Warn = renderText({
-		return("Warning: Takes quite some time to compute!");
+		hasDTM = ! is.null(values$dfDTMData);
+		msg = if(hasDTM) {
+			"Warning: Takes quite some time to compute!";
+		} else {
+			"No DTM!";
+		}
+		return(msg);
+	})
+	output$txtTreeDx_Info = renderText({
+		hasDTM = ! is.null(values$dfDTMData);
+		msg = if(hasDTM) {
+			paste("Press the *Correlation* button to compute and",
+				"plot the correlations between the trees",
+				"generated using the various clustering methods.");
+		} else {
+			paste("Note: A DocumentTermMatrix needs to be generated first:",
+				"see the DTM tab.");
+		}
+		return(msg);
 	})
 	
 	### Generalised Beta Distribution

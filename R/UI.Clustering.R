@@ -43,7 +43,7 @@ panelClustering = function(img.height = 800) {
 }
 
 ### Tab: Diagnostics
-panelClusterDiagnostics = function(img.height = 640) {
+panelClusterDiagnostics = function(img.height = 560) {
 	hImg = as.img.height(img.height);
 	# UI:
 	sidebarLayout(
@@ -54,9 +54,11 @@ panelClusterDiagnostics = function(img.height = 640) {
 		column(6, selectDxCorOrder()),
 		),
 		actionButton("btnTreeCor", "Correlation"),
+		# Messages:
+		fluidRow(h3(textOutput("txtTreeDx_Warn"))),
+		fluidRow(textOutput("txtTreeDx_Info")),
 	),
 	mainPanel(
-		fluidRow(textOutput("txtTreeDx_Warn")),
 		plotOutput("imgTreeCor", height = hImg),
 	)
 	)
