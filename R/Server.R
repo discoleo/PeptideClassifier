@@ -539,7 +539,8 @@ server.app = function(input, output, session) {
 		# - which is a filtered version of values$dfFltData;
 		xdf = values$dfDTMData;
 		if(is.null(xdf)) return();
-		hClust = hclust(dist(xdf));
+		type   = input$fltTreeType;
+		hClust = hclust(dist(xdf), method = type);
 		values$clustResult = hClust;
 		print(str(hClust));
 		output$imgTree = renderPlot(plot(hClust));
