@@ -541,6 +541,7 @@ server.app = function(input, output, session) {
 		# Based on DTM-Data!
 		# - which is a filtered version of values$dfFltData;
 		# dtm = values$dfDTMData; # Actual/Raw Data
+		# Based directly on DTM:
 		dtm = values$dtmFlt;
 		if(is.null(dtm)) return();
 		type   = input$fltTreeType;
@@ -637,6 +638,17 @@ server.app = function(input, output, session) {
 			write.csv(x, file, row.names = FALSE);
 		}
 	)
+	# Tree: Save full Tree
+	output$downloadTree = downloadHandler(
+		filename = function() {
+			paste("Tree.Full.rds", sep = "");
+		},
+		content = function(file) {
+			x = values$clustResult;
+			if(is.null(x)) return();
+			saveRDS(x, file = file);
+		}
+	)
 	
 	# Messages:
 	output$txtTreeWarn = renderText({
@@ -664,7 +676,8 @@ server.app = function(input, output, session) {
 	### Clustering: Diagnostics
 	
 	observeEvent(input$btnTreeCor, {
-		xdf = values$dfDTMData;
+		# xdf = values$dfDTMData;
+		xdf = values$dtmFlt; # Based on DTM;
 		if(is.null(xdf)) return();
 		# Required Packages:
 		pkgs = c("dendextend", "corrplot");
@@ -674,6 +687,7 @@ server.app = function(input, output, session) {
 		}
 		# Clustering: All Methods
 		d = dist(xdf);
+		cat("Finished Dist; starting Clustering!\n");
 		clustMethods = c("ward.D", "single", "complete", "average",
 			"mcquitty", "median", "centroid", "ward.D2");
 		lstClust = dendlist();
@@ -686,6 +700,7 @@ server.app = function(input, output, session) {
 		cat("Starting cor.dendlist: this takes time!\n");
 		### Correlations:
 		corClusters = cor.dendlist(lstClust);
+		cat("Finished cor.dendlist!\n");
 		values$corClusters = corClusters;
 	})
 	

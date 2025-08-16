@@ -24,8 +24,9 @@ panelClustering = function(img.height = 800) {
 		),
 		actionButton("btnSubtree", "SubTree"),
 		actionButton("btnSubT_Details", "Peptides"),
-	# SubTree Data:
-	downloadButton("downloadSubT_Data", "Data"),
+		# SubTree Data:
+		downloadButton("downloadSubT_Data", "Data"),
+		downloadButton("downloadTree", "Full Tree"),
 		NBSP(),
 		fluidRow(
 		column(6, selectClusterType()),
