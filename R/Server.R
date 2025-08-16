@@ -52,7 +52,7 @@ server.app = function(input, output, session) {
 		dfFltData = NULL,   # Data filtered in Table
 		dfDTMData = NULL,   # Filtered Data used for DTM
 		dataDTM   = NULL,   # Filtered Seq-Data for Topic Models
-		dtmData   = NULL,   # DTM
+		dtmData   = NULL,   # DTM (Un-Filtered)
 		dtmFlt    = NULL,   # Filtered DTM
 		tf.idf    = NULL,   # TF-IDF
 		termsAll  = NULL,   # All Terms (non-filtered)
@@ -540,10 +540,12 @@ server.app = function(input, output, session) {
 	output$tblClusters = DT::renderDT({
 		# Based on DTM-Data!
 		# - which is a filtered version of values$dfFltData;
-		xdf = values$dfDTMData;
-		if(is.null(xdf)) return();
+		# dtm = values$dfDTMData; # Actual/Raw Data
+		dtm = values$dtmFlt;
+		if(is.null(dtm)) return();
 		type   = input$fltTreeType;
-		hClust = hclust(dist(xdf), method = type);
+		distM  = dist(dtm);
+		hClust = hclust(distM, method = type);
 		values$clustResult = hClust;
 		print(str(hClust));
 		# Plot:
