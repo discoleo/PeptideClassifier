@@ -17,9 +17,22 @@ panelClustering = function(img.height = 800) {
 	# UI:
 	sidebarLayout(
 	sidebarPanel(
+		fluidRow(
+		column(6, selectClusterType()),
+		# Plot Orientation:
+		column(6, selectClusterPlotOrientation())
+		),
+		# Generate Tree:
+		fluidRow(
+		column(3,
+			NBSP(),
+			actionButton("btnTreeBuild", "Build Tree")),
+		column(9, fileInput.rds("loadTree", "Load existing Tree")),
+		),
+		# SubTrees:
 		h3("Subtree:"),
 		fluidRow(
-		column(4, textInput("txtSubTree_Node", "Node/Peptide", "")),
+		column(8, textInput("txtSubTree_Node", "Node/Peptide", "")),
 		column(4, textInput("txtSubTree_Size", "Size", "50")),
 		),
 		actionButton("btnSubtree", "SubTree"),
@@ -27,12 +40,6 @@ panelClustering = function(img.height = 800) {
 		# SubTree Data:
 		downloadButton("downloadSubT_Data", "Data"),
 		downloadButton("downloadTree", "Full Tree"),
-		NBSP(),
-		fluidRow(
-		column(6, selectClusterType()),
-		# Plot Orientation:
-		column(6, selectClusterPlotOrientation())
-		),
 		# Messages
 		h3(textOutput("txtTreeWarn")),
 		textOutput("txtTreeInfo"),

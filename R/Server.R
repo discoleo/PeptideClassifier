@@ -537,7 +537,7 @@ server.app = function(input, output, session) {
 	
 	### Hierarchical Clustering
 	
-	output$tblClusters = DT::renderDT({
+	observeEvent(input$btnTreeBuild, {
 		# Based on DTM-Data!
 		# - which is a filtered version of values$dfFltData;
 		# dtm = values$dfDTMData; # Actual/Raw Data
@@ -549,11 +549,17 @@ server.app = function(input, output, session) {
 		hClust = hclust(distM, method = type);
 		values$clustResult = hClust;
 		print(str(hClust));
+	})
+	output$tblClusters = DT::renderDT({
+		return(NULL);
+	})
+	output$imgTree = renderPlot({
+		hClust = values$clustResult;
+		if(is.null(hClust)) return();
 		# Plot:
 		orientH = input$fltTreePlotOrientation;
 		hClust  = as.dendrogram(hClust);
-		output$imgTree = renderPlot(plot(hClust, horiz = orientH));
-		return(NULL);
+		plot(hClust, horiz = orientH);
 	})
 	
 	### Extract SubTree:
@@ -641,7 +647,8 @@ server.app = function(input, output, session) {
 	# Tree: Save full Tree
 	output$downloadTree = downloadHandler(
 		filename = function() {
-			paste("Tree.Full.rds", sep = "");
+			type = input$fltTreeType;
+			paste("Tree.Full.M_", type, ".rds", sep = "");
 		},
 		content = function(file) {
 			x = values$clustResult;
@@ -649,6 +656,14 @@ server.app = function(input, output, session) {
 			saveRDS(x, file = file);
 		}
 	)
+	observeEvent(input$loadTree, {
+		ff = input$loadTree;
+		if(is.null(ff)) 
+			return(NULL);
+		#
+		x = readRDS(ff$datapath);
+		values$clustResult = x;
+	})
 	
 	# Messages:
 	output$txtTreeWarn = renderText({

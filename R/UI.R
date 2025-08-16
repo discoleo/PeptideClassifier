@@ -24,6 +24,13 @@ fileInput.data = function(id, label, csv = FALSE) {
 		accept = accept
     );
 }
+fileInput.rds = function(id, label) {
+	accept = c(".rds");
+	shiny::fileInput(id, label,
+		multiple = FALSE,
+		accept = accept
+    );
+}
 
 NBSP = function(as.row = TRUE) {
 	html = HTML("&nbsp;");
