@@ -614,6 +614,29 @@ server.app = function(input, output, session) {
 		}
 	)
 	
+	# Messages:
+	output$txtTreeWarn = renderText({
+		hasDTM = ! is.null(values$dfDTMData);
+		msg = if(hasDTM) {
+			"";
+		} else {
+			"No DTM!";
+		}
+		return(msg);
+	})
+	output$txtTreeInfo = renderText({
+		hasDTM = ! is.null(values$dfDTMData);
+		msg = if(hasDTM) {
+			paste("Press the *SubTree* button",
+				"to extract a sub-tree containing at least n Leaves",
+				"and the node specified in the Node-field.");
+		} else {
+			paste("Note: A DocumentTermMatrix needs to be generated first:",
+				"see the DTM tab.");
+		}
+		return(msg);
+	})
+	
 	### Clustering: Diagnostics
 	
 	observeEvent(input$btnTreeCor, {

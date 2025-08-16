@@ -26,12 +26,15 @@ panelClustering = function(img.height = 800) {
 		actionButton("btnSubT_Details", "Peptides"),
 	# SubTree Data:
 	downloadButton("downloadSubT_Data", "Data"),
-	fluidRow(HTML("&nbsp;")),
-	fluidRow(
-	column(6, selectClusterType()),
-	# Plot Orientation:
-	column(6, selectClusterPlotOrientation())
-	),
+		NBSP(),
+		fluidRow(
+		column(6, selectClusterType()),
+		# Plot Orientation:
+		column(6, selectClusterPlotOrientation())
+		),
+		# Messages
+		h3(textOutput("txtTreeWarn")),
+		textOutput("txtTreeInfo"),
 	),
 	mainPanel(
 		plotOutput("imgTree", height = hImg),
