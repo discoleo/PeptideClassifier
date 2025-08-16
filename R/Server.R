@@ -655,6 +655,18 @@ server.app = function(input, output, session) {
 			order = orderCor);
 	})
 	
+	# Correlation between Trees: Save Values
+	output$downloadTreeCor = downloadHandler(
+		filename = function() {
+			"Tree.Corr.All.csv";
+		},
+		content = function(file) {
+			x = values$corClusters;
+			if(is.null(x)) return();
+			write.csv(x, file, row.names = FALSE);
+		}
+	)
+	
 	# Messages:
 	output$txtTreeDx_Warn = renderText({
 		hasDTM = ! is.null(values$dfDTMData);

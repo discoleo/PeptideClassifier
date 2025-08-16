@@ -54,6 +54,7 @@ panelClusterDiagnostics = function(img.height = 560) {
 		column(6, selectDxCorOrder()),
 		),
 		actionButton("btnTreeCor", "Correlation"),
+		downloadButton("downloadTreeCor", "Correlation"),
 		# Messages:
 		fluidRow(h3(textOutput("txtTreeDx_Warn"))),
 		fluidRow(textOutput("txtTreeDx_Info")),
