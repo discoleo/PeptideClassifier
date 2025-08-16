@@ -18,6 +18,7 @@ server.app = function(input, output, session) {
 	options = list(
 		fltGlobalLen    = c(6, 60), # Default value for Global Length;
 		sep = ",",         # csv Separator
+		sepCsvCor = ",",   # csv Separator: Cor-Matrix;
 		# Regex & Other Options:
 		reg.Data  = TRUE,  # Regex for Data-Table
 		reg.PP    = TRUE,  # Regex for Epitopes-Table
@@ -666,6 +667,17 @@ server.app = function(input, output, session) {
 			write.csv(x, file, row.names = FALSE);
 		}
 	)
+	observeEvent(input$loadTreeCor, {
+		ff = input$loadTreeCor;
+		if(is.null(ff)) 
+			return(NULL);
+		#
+		x = read.csv(ff$datapath, sep = options$sepCsvCor);
+		nms = names(x);
+		x   = as.matrix(x);
+		dimnames(x) = list(nms, nms);
+		values$corClusters = x;
+	})
 	
 	# Messages:
 	output$txtTreeDx_Warn = renderText({

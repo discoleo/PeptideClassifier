@@ -55,6 +55,8 @@ panelClusterDiagnostics = function(img.height = 560) {
 		),
 		actionButton("btnTreeCor", "Correlation"),
 		downloadButton("downloadTreeCor", "Correlation"),
+		NBSP(),
+		fileInput.data("loadTreeCor", "Select csv file with Correlations"),
 		# Messages:
 		fluidRow(h3(textOutput("txtTreeDx_Warn"))),
 		fluidRow(textOutput("txtTreeDx_Info")),

@@ -11,15 +11,26 @@
 ## draft v.0.2c
 
 
-fileInput.csv = function(id, label) {
+fileInput.data = function(id, label, csv = FALSE) {
+	accept = c(
+			"text/csv",
+			"text/comma-separated-values",
+			"text/plain", ".csv", ".txt");
+	if(! csv) {
+		accept = c(accept, "text/fasta", ".fasta", ".fa");
+	}
 	shiny::fileInput(id, label,
 		multiple = FALSE,
-		accept = c(
-			"text/csv",
-			"text/fasta",
-			"text/comma-separated-values,text/plain",
-			".csv", ".fasta", ".fa", ".txt")
+		accept = accept
     );
+}
+
+NBSP = function(as.row = TRUE) {
+	html = HTML("&nbsp;");
+	if(as.row) {
+		html = fluidRow(html);
+	}
+	return(html);
 }
 
 
@@ -50,7 +61,7 @@ getUI = function(version = 2) {
 			sidebarLayout(
 				sidebarPanel(
 					titlePanel("Load file"),
-					fileInput.csv("file", "Select CSV / FASTA file"),
+					fileInput.data("file", "Select CSV / FASTA file"),
 					# Note: value is initialised in code;
 					sliderInput(inputId = "fltGlobalLen", label = "Global Length",
 						value = c(6, 60), min = 0, max = 100, step = 1),
