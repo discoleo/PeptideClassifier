@@ -209,6 +209,25 @@ server.app = function(input, output, session) {
 		return("Data summary:");
 	})
 	
+	# Jump to Page:
+	observeEvent(input$btnDataGoTo, {
+		pp = input$txtDataPP;
+		if(is.null(pp) || nchar(pp) == 0) return();
+		x = values$dfFltData;
+		if(is.null(x)) return();
+		#
+		id = which(grepl(pp, x$Seq));
+		if(length(id) == 0) return();
+		if(length(id) > 1) {
+			if(length(id) <= 10) print(id);
+			id = id[1];
+		}
+		# Page:
+		pg = (id - 1) %/% 10 + 1; # TODO: Items per page;
+		proxy = dataTableProxy('tblData');
+		selectPage(proxy, pg);
+	})
+	
 	### Modelling: DTM
 	
 	filterSeq = reactive({
@@ -581,8 +600,10 @@ server.app = function(input, output, session) {
 					cat("Found multiple sequences!\n");
 					node = node[1];
 				}
-				node = values$clustResult$labels[node];
-				node = as.integer(node);
+				# dfDTMData => DTM => FilteredDTM => Clustering
+				# Note: matching is done (again) below;
+				# node = which(values$clustResult$labels == node);
+				# node = as.integer(node);
 				cat("Node: ", node, "\n");
 			}
 		}
@@ -591,6 +612,7 @@ server.app = function(input, output, session) {
 		}
 		iNode = node;
 		if(iNode > 0) {
+			# Match Seq-Label:
 			iNode = match(iNode, x$labels);
 			if(is.na(iNode)) { resetST(); return(); }
 		}
@@ -617,7 +639,7 @@ server.app = function(input, output, session) {
 		if(is.null(x)) return(NULL);
 		ids = as.numeric(x$labels);
 		# TODO: check if Data-source correct!
-		dfx = values$dfFltData;
+		dfx = values$dfDTMData;
 		dfx = dfx[ids, ];
 	}
 	
@@ -769,9 +791,11 @@ server.app = function(input, output, session) {
 	output$txtTreeDx_Info = renderText({
 		hasDTM = ! is.null(values$dfDTMData);
 		msg = if(hasDTM) {
-			paste("Press the *Correlation* button to compute and",
-				"plot the correlations between the trees",
-				"generated using the various clustering methods.");
+			paste("Plot the correlations between the trees",
+				"generated using the various hierarchical clustering methods.",
+				"Either press the *Correlation* button to compute these values;",
+				"or load a previously saved matrix of correlations."
+				);
 		} else {
 			paste("Note: A DocumentTermMatrix needs to be generated first:",
 				"see the DTM tab.");

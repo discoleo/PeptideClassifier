@@ -79,6 +79,9 @@ getUI = function(version = 2) {
 						selected = "All"),
 					checkboxInput("chkRegex", "Regex Search: Data", value = TRUE),
 					downloadButton("downloadData", "Download"),
+					# GoTo Page in Table:
+					actionButton("btnDataGoTo", "GoTo"),
+					textInput("txtDataPP", "GoTo Peptide", ""),
 				),
 				mainPanel(
 				fluidRow(DT::DTOutput("tblData")),
