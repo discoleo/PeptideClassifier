@@ -559,18 +559,38 @@ server.app = function(input, output, session) {
 		x = values$clustResult;
 		if(is.null(x)) { resetST(); return(); }
 		# Include Leaf:
-		node = input$txtSubTree_Node;
-		node = as.integer(node);
-		if(is.na(node) || node == 0) { resetST(); return(); }
-		if(node > 0) {
-			node = match(node, x$labels);
-			if(is.na(node)) { resetST(); return(); }
+		strN = input$txtSubTree_Node;
+		node = as.integer(strN);
+		if(is.na(node)) {
+			node = which(grepl(strN, values$dfDTMData$Seq));
+			if(length(node) == 0) {
+				cat("Found 0 sequences!\n");
+				node = 0;
+			} else {
+				# TODO
+				if(length(node) > 1) {
+					cat("Found multiple sequences!\n");
+					node = node[1];
+				}
+				node = values$clustResult$labels[node];
+				node = as.integer(node);
+				cat("Node: ", node, "\n");
+			}
+		}
+		if(node == 0) {
+			resetST(); return();
+		}
+		iNode = node;
+		if(iNode > 0) {
+			iNode = match(iNode, x$labels);
+			if(is.na(iNode)) { resetST(); return(); }
 		}
 		# Size
 		size = input$txtSubTree_Size;
 		size = as.integer(size);
 		if(is.na(size) || size == 0) { resetST(); return(); }
-		subT = subtree.nc(node, n = size, x);
+		subT = subtree.nc(iNode, n = size, x);
+		attr(subT, "N0") = node;
 		values$clustSubTree = subT;
 	})
 	
@@ -578,7 +598,9 @@ server.app = function(input, output, session) {
 	output$imgSubTree = renderPlot({
 		x = values$clustSubTree;
 		if(is.null(x)) return();
-		plot(x);
+		node = attr(x, "N0");
+		node = paste0("Subtree: ", node);
+		plot(x, xlab = node);
 	});
 	
 	readFromTree = function() {

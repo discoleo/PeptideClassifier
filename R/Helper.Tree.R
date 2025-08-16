@@ -33,13 +33,14 @@ count.nodes = function(x) {
 ### Extract Subtree
 # x = Leaf included in the subtree;
 # n = Minimal Number of leafs in subtree;
-subtree.nc = function(x, n, tree) {
+subtree.nc = function(x, n, tree, debug = FALSE) {
 	v  = count.nodes(tree);
 	n0 = - x;
 	x  = tree$merge;
 	# Start from Leaf:
 	id0 = which(x[,1] == n0 | x[,2] == n0);
-	nnQ = c(id0); id = id0; print(id0)
+	nnQ = c(id0); id = id0;
+	if(debug) print(id0);
 	if(x[id, 1] > 0) nnQ = c(nnQ, x[id, 1]);
 	if(x[id, 2] > 0) nnQ = c(nnQ, x[id, 2]);
 	nS = 2;
