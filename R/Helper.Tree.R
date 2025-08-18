@@ -37,6 +37,16 @@ subtree.nc = function(x, n, tree, debug = FALSE) {
 	v  = count.nodes(tree);
 	n0 = - x;
 	x  = tree$merge;
+	# Minimalistic checks:
+	LEN   = nrow(x);
+	idErr = which(x[,1] >= seq(LEN));
+	if(length(idErr) > 0) {
+		x[idErr, 1] = -Inf;
+	}
+	idErr = which(x[,2] >= seq(LEN));
+	if(length(idErr) > 0) {
+		x[idErr, 2] = -Inf;
+	}
 	# Start from Leaf:
 	id0 = which(x[,1] == n0 | x[,2] == n0);
 	nnQ = c(id0); id = id0;
@@ -144,3 +154,35 @@ order.tree = function(x) {
 	}
 	return(nOrder);
 }
+
+
+### Collect all Leaves on a Branch
+# x = Matrix of Nodes;
+collect.nodes = function(id, x) {
+	nQ = c(id); nnL = c();
+	nS = 1;
+	while(nS <= length(nQ)) {
+		id = nQ[nS];
+		hasLeaf = TRUE;
+		if(x[id,1] < 0) {
+			nnL = c(nnL, x[id,1]);
+		} else {
+			nQ[nS] = x[id,1];
+			hasLeaf = FALSE;
+		}
+		if(x[id,2] < 0) {
+			nnL = c(nnL, x[id,2]);
+		} else {
+			if(hasLeaf) {
+				nQ[nS] = x[id,2];
+				hasLeaf = FALSE;
+			} else {
+				# Order does NOT matter;
+				nQ = c(nQ, x[id,2]);
+			}
+		}
+		if(hasLeaf) nS = nS + 1;
+	}
+	return(nnL);
+}
+
