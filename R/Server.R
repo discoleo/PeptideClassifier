@@ -216,6 +216,14 @@ server.app = function(input, output, session) {
 		x = values$dfFltData;
 		if(is.null(x)) return();
 		#
+		if(grepl("^[0-9]", pp)) {
+			# Page number:
+			id = as.integer(pp);
+			if(is.na(pp) || pp == 0) return();
+			setPage(pp, 'tblData');
+			return();
+		}
+		# Peptide Seq:
 		id = which(grepl(pp, x$Seq));
 		if(length(id) == 0) return();
 		if(length(id) > 1) {
@@ -224,9 +232,12 @@ server.app = function(input, output, session) {
 		}
 		# Page:
 		pg = (id - 1) %/% 10 + 1; # TODO: Items per page;
-		proxy = dataTableProxy('tblData');
-		selectPage(proxy, pg);
+		setPage(pg, 'tblData');
 	})
+	setPage = function(pg, tbl) {
+		proxy = dataTableProxy(tbl);
+		selectPage(proxy, pg);
+	}
 	
 	### Modelling: DTM
 	
@@ -630,8 +641,17 @@ server.app = function(input, output, session) {
 		x = values$clustSubTree;
 		if(is.null(x)) return();
 		node = attr(x, "N0");
-		node = paste0("Subtree: ", node);
-		plot(x, xlab = node);
+		lblN = paste0("Subtree: ", node);
+		# xPos:
+		xPos   = match(as.character(node), x$labels);
+		isNode = ! is.na(xPos);
+		height = max(x$height);
+		xPos   = which(x$order == xPos);
+		print(c(xPos, height));
+		# Plot:
+		plot(x, xlab = lblN);
+		if(isNode) lines(c(xPos, xPos) + 0.25, c(0, height),
+			lwd = 3, col = "#FF243680");
 	});
 	
 	readFromTree = function() {
