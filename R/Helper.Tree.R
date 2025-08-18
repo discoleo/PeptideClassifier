@@ -100,9 +100,94 @@ subtree.nc = function(x, n, tree, debug = FALSE) {
 	subT = subtree.nn(nnQ, tree);
 	return(subT);
 }
-# Repair Tree
+
+### Collapse/Prune Tree
+# n = Min-size of branch;
+#   where size = count(Leaves);
+collapse.tree = function(n, tree) {
+	nn = count.nodes(tree);
+	x  = tree$merge;
+	LEN = nrow(x); MAX = max(tree$order);
+	nnQ = LEN; nposQ = 1;
+	nnT = c(); nnL = list();
+	# Warning: naive implementation; NO bound checks;
+	while(nposQ <= length(nnQ)) {
+		id = nnQ[nposQ];
+		if(nn[id] >= n) {
+			nnT = c(id, nnT);
+			# Keep Leaves; Add Sub-nodes to Queue;
+			# Verify SubTrees:
+			hasLeafs = TRUE; nmN = NULL;
+			if(x[id,1] > 0) {
+				if(nn[x[id,1]] >= n) {
+					# nnT = c(nnT, x[id,1]);
+					nnQ[nposQ] = x[id,1];
+					hasLeafs = FALSE;
+				} else {
+					nnLeafs = collect.nodes(x[id,1], x);
+					MAX = MAX + 1;
+					x[id,1] = - MAX;
+					nmN = paste0("L", id);
+					nnL[[nmN]] = list(Lvl = id, N = nnLeafs);
+				}
+			}
+			if(x[id,2] > 0) {
+				if(nn[x[id,2]] >= n) {
+					# nnT = c(nnT, x[id,2]);
+					if(hasLeafs) {
+						nnQ[nposQ] = x[id,2];
+						hasLeafs = FALSE;
+					} else {
+						nnQ = c(nnQ, x[id,2]);
+					}
+				} else {
+					nnLeafs = collect.nodes(x[id,2], x);
+					MAX = MAX + 1;
+					x[id,2] = - MAX;
+					if(is.null(nmN)) {
+						nmN = paste0("L", id);
+						nnL[[nmN]] = list(Lvl = id, N = nnLeafs);
+					} else nnL[[nmN]]$N = c(nnL[[nmN]]$N, nnLeafs);
+				}
+			}
+			if(hasLeafs) nposQ = nposQ + 1; # Next node in Queue;
+		} else {
+			# Probably the Root-Node < n;
+			# TODO: re-design / keep node & makes Leafs;
+			print("Root fails.")
+			nposQ = nposQ + 1;
+			nmN   = paste0("L", id);
+			nnL[nmN] = list(Lvl = id, N = c());
+			if(x[id,1] < 0) {
+				nnL[[nmN]]$N = c(nnL[[nmN]]$N, x[id,1]);
+			} else {
+				allL = collect.nodes(id, x);
+				nnL[[nmN]]$N = c(nnL[[nmN]]$N, allL);
+			}
+			if(x[id,2] < 0) {
+				nnL[[nmN]]$N = c(nnL[[nmN]]$N, x[id,2]);
+			} else {
+				allL = collect.nodes(x[id,2], x);
+				nnL[[nmN]]$N = c(nnL[[nmN]]$N, allL);
+			}
+			MAX = MAX + 2;
+			x[id,] = c(-MAX + 1, -MAX);
+			nnT = c(nnT, id);
+		}
+	}
+	# Extract Tree:
+	nnT = sort(unique(nnT));
+	tree$merge = x;
+	tree = subtree.fromRoot(nnT, tree);
+	# TODO: save collapsed Nodes (nnL list);
+	return(tree);
+}
+
+
+### Repair Tree
 # - for extracted Subtree;
 # Note: may be meaningful to construct de-novo the tree;
+# x = Rows to keep from the tree$merge matrix;
 subtree.nn = function(x, tree) {
 	x  = sort(unique(x));
 	id = rep(0, nrow(tree$merge));
@@ -119,6 +204,36 @@ subtree.nn = function(x, tree) {
 	tree$order = order.tree(tree);
 	if(! is.null(tree$labels)) {
 		tree$labels = tree$labels[oldN];
+	}
+	return(tree);
+}
+
+# Repair pruned SubTree (from root)
+# x = Rows to keep from the tree$merge matrix;
+subtree.fromRoot = function(pos, tree) {
+	nnT = pos; x = tree$merge;
+	TOP = length(tree$order);
+	T0 = rep(0, nrow(x));
+	T0[nnT] = 1;
+	T0 = cumsum(T0);
+	T0 = c(T0, T0);
+	x  = x[nnT,]; # New Tree;
+	oldN = - x[x < 0];
+	oldN = oldN[oldN <= TOP];
+	nLen = sum(x < 0); # Leafs
+	x[x < 0] = - seq(nLen);
+	x[x > 0] = T0[x[x > 0]];
+	# New Tree:
+	tree$merge  = x;
+	tree$height = tree$height[nnT];
+	tree$order = order.tree(tree);
+	if(! is.null(tree$labels)) {
+		# TODO
+		tree$labels = tree$labels[oldN];
+		LEN = length(oldN);
+		if(LEN < nLen) {
+			tree$labels = c(tree$labels, seq(LEN + 1, nLen));
+		}
 	}
 	return(tree);
 }
@@ -187,6 +302,7 @@ collect.nodes = function(id, x) {
 }
 
 ### Plot Tree/SubTree
+#' @export
 plot.subtree = function(x, mark = TRUE, lwd = 3,
 		col = "#FF243680", adj = c(0.25)) {
 	node = attr(x, "N0");
