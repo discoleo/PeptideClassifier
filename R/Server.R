@@ -81,6 +81,7 @@ server.app = function(input, output, session) {
 		# Hierarchical Clusters
 		clustResult  = NULL,
 		clustSubTree = NULL,
+		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
 		# Clustering: Diagnostics
 		corClusters  = NULL,
 		# Maths
@@ -580,12 +581,29 @@ server.app = function(input, output, session) {
 		values$clustResult = hClust;
 		print(str(hClust));
 	})
+	
+	# Prune Tree:
+	observeEvent(input$btnTreePruneSize, {
+		size = input$inTreeMinSize;
+		if(is.null(size) || nchar(size) == 0) {
+			values$pruneTreeSize = 0;
+			return();
+		}
+		size = as.integer(size);
+		if(is.na(size)) size = 0;
+		values$pruneTreeSize = size;
+	})
+	
 	output$tblClusters = DT::renderDT({
 		return(NULL);
 	})
 	output$imgTree = renderPlot({
 		hClust = values$clustResult;
 		if(is.null(hClust)) return();
+		size = values$pruneTreeSize;
+		if(size != 0) {
+			hClust = collapse.tree(size, tree = hClust);
+		}
 		# Plot:
 		orientH = input$fltTreePlotOrientation;
 		hClust  = as.dendrogram(hClust);

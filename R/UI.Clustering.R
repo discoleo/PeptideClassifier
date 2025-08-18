@@ -23,11 +23,16 @@ panelClustering = function(img.height = 800) {
 		column(6, selectClusterPlotOrientation())
 		),
 		# Generate Tree:
+		fileInput.rds("loadTree", "Load existing Tree"),
 		fluidRow(
-		column(3,
-			NBSP(),
-			actionButton("btnTreeBuild", "Build Tree")),
-		column(9, fileInput.rds("loadTree", "Load existing Tree")),
+		column(8,
+			actionButton("btnTreeBuild", "Build Tree"),
+			actionButton("btnTreePruneSize", "Prune"),
+		)),
+		NBSP(),
+		fluidRow(
+		column(6, textInput("inTreeMinSize",
+			"Branches: Min Size", "20")),
 		),
 		# SubTrees:
 		h3("Subtree:"),
