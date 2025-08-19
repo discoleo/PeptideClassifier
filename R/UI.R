@@ -110,6 +110,10 @@ getUI = function(version = 2) {
 		tabPanel("Gen.Beta", # icon = icon("BetaDist"),
 			panelBetaDist()
 		),
+		# Future Ideas
+		tabPanel("TODO", # icon = icon("TODO"),
+			panelTODO()
+		),
 	) ) )
 }
 
