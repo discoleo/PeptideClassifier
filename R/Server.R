@@ -300,7 +300,26 @@ server.app = function(input, output, session) {
 		}
 		# Doc ID:
 		id = input$fltDTMDocID;
-		id = as.integer(id);
+		# Reset:
+		if(is.null(id) || nchar(id) == 0) {
+			output$txtDTM_PP = NULL;
+			output$txtDTM_PP_Terms = NULL;
+			return();
+		}
+		isNum = grepl("^\\-?[0-9]", id);
+		if(! isNum) {
+			id = match(id, values$dfDTMData$Seq);
+			if(is.na(id)) {
+				cat("Invalid Seq!\n");
+				output$txtDTM_PP_Terms = NULL;
+				return();
+			}
+			# doc = id; # TODO: avoid duplicated code;
+			# TODO: is id already == match(...)?
+			id = match(as.character(id), labels.dtm(dtm));
+		} else {
+			id = as.integer(id);
+		}
 		if(is.na(id) || id < 1) {
 			warning("Invalid Doc id!");
 			id = 1;

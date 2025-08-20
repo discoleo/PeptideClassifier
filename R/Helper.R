@@ -12,6 +12,7 @@
 augment.pp = function(x) {
 	x = cbind(x, charge.pp(x$Seq));
 	x$ChargesN = x$Charged / x$Len;
+	rownames(x) = seq(nrow(x));
 	return(x);
 }
 

@@ -31,9 +31,17 @@ dtm = function(x, min.len = 1) {
 			removeNumbers = FALSE, removePunctuation = FALSE));
 }
 
+
+### Dim
 #' @export
 dim.dtm = function(x) {
 	dim(x);
+}
+
+### Document Names/Labels
+#' @export
+labels.dtm = function(x) {
+	x$dimnames[[1]];
 }
 
 # x = DTM;

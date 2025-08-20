@@ -81,7 +81,7 @@ getUI = function(version = 2) {
 					downloadButton("downloadData", "Download"),
 					# GoTo Page in Table:
 					actionButton("btnDataGoTo", "GoTo"),
-					textInput("txtDataPP", "GoTo Peptide", ""),
+					textInput("txtDataPP", "GoTo Peptide Sequence / Page:", ""),
 				),
 				mainPanel(
 				fluidRow(DT::DTOutput("tblData")),
