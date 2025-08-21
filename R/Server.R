@@ -682,18 +682,23 @@ server.app = function(input, output, session) {
 		print(pos);
 	});
 	
-	readFromTree = function() {
+	readFromTree = function(add.id = FALSE) {
 		x = values$clustSubTree;
 		if(is.null(x)) return(NULL);
-		ids = as.numeric(x$labels);
+		ids = as.integer(x$labels)[x$order];
 		# TODO: check if Data-source correct!
+		# TODO: still errors/inconsistencies;
+		doc = labels.dtm(values$dtmFlt)[ids];
+		doc = as.integer(doc);
 		dfx = values$dfDTMData;
-		dfx = dfx[ids, ];
+		dfx = dfx[doc, ];
+		if(add.id) dfx = cbind(ID = ids, dfx);
+		return(dfx);
 	}
 	
 	# SubTree: PP Details
 	observeEvent(input$btnSubT_Details, {
-		x = readFromTree();
+		x = readFromTree(add.id = TRUE);
 		if(is.null(x)) return();
 		output$tblSubTree = DT::renderDT({
 			DT::datatable(x, filter = 'top',
