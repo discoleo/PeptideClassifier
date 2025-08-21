@@ -51,6 +51,7 @@ subtree.nc = function(x, n, tree, debug = FALSE) {
 	id0 = which(x[,1] == n0 | x[,2] == n0);
 	nnQ = c(id0); id = id0;
 	if(debug) print(id0);
+	# Add descendants:
 	if(x[id, 1] > 0) nnQ = c(nnQ, x[id, 1]);
 	if(x[id, 2] > 0) nnQ = c(nnQ, x[id, 2]);
 	nS = 2;
@@ -60,6 +61,7 @@ subtree.nc = function(x, n, tree, debug = FALSE) {
 		if(x[id,1] > 0) nnQ = c(nnQ, x[id, 1]);
 		if(x[id,2] > 0) nnQ = c(nnQ, x[id, 2]);
 	}
+	if(debug) { cat("N0 + Desc: "); print(head(nnQ)); }
 	if(v[id0] >= n) {
 		subT = subtree.nn(nnQ, tree);
 		return(subT);
@@ -193,12 +195,14 @@ subtree.nn = function(x, tree) {
 	id = rep(0, nrow(tree$merge));
 	id[x] = 1; id = cumsum(id);
 	nn = tree$merge[x,];
-	oldN = - nn[nn < 0];
-	nn[nn[,1] > 0, 1] = id[nn[nn[,1] > 0, 1]];
-	nn[nn[,2] > 0, 2] = id[nn[nn[,2] > 0, 2]];
-	isN = nn < 0; nn0 = - nn[isN];
-	idN = order(nn0);
-	nn[isN] = - idN;
+	isLf  = nn < 0;
+	oldN  = - nn[isLf];
+	isRef = nn[,1] > 0; nn[isRef, 1] = id[nn[isRef, 1]];
+	isRef = nn[,2] > 0; nn[isRef, 2] = id[nn[isRef, 2]];
+	# nn0 = - nn[isLf];
+	# idN = seq(order(nn0));
+	idN   = seq(sum(isLf));
+	nn[isLf] = - idN;
 	tree$merge  = nn;
 	tree$height = tree$height[x];
 	tree$order = order.tree(tree);

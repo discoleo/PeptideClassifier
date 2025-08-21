@@ -596,6 +596,7 @@ server.app = function(input, output, session) {
 		if(is.null(dtm)) return();
 		type   = input$fltTreeType;
 		distM  = dist(dtm);
+		# Note: attr(distM, "labels") == NULL!
 		hClust = hclust(distM, method = type);
 		values$clustResult = hClust;
 		print(str(hClust));
