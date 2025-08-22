@@ -432,8 +432,8 @@ server.app = function(input, output, session) {
 		return(idModel);
 	}
 	
-	observeEvent(input$numClusters, {
-		values$nClusters = input$numClusters;
+	observeEvent(input$numTMClusters, {
+		values$nClusters = input$numTMClusters;
 	})
 	
 	observeEvent(input$inTMSeed, {
@@ -510,7 +510,7 @@ server.app = function(input, output, session) {
 		if(is.null(x$TM)) return();
 		cat("Finished Loading TMs.\n");
 		# Set parameters:
-		updateNumericInput (session, "numClusters",
+		updateNumericInput (session, "numTMClusters",
 			value = x$TM[[1]]@k);
 		seed = x$Seed;
 		if(is.null(seed)) seed = "";

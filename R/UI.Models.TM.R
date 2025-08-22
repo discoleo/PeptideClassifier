@@ -5,7 +5,8 @@
 panelTopicModel = function() {
 	sidebarLayout(
 		sidebarPanel(
-			sliderInput(inputId = "numClusters", label = "Clusters / Topics",
+			sliderInput(inputId = "numTMClusters",
+				label = "Clusters / Topics",
 				value = 6, min = 2, max = 42, step = 1),
 			selectModel.TM(),
 			actionButton("btnModelTopics", "Run Model"),
