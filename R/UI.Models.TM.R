@@ -11,6 +11,7 @@ panelTopicModel = function() {
 			actionButton("btnModelTopics", "Run Model"),
 			downloadButton("downloadTMSummary", "Summary"), # Export Summary
 			downloadButton("downloadTMTopics", "Topics"),   # Export Topics
+			downloadButton("downloadTMFull", "Full"),       # Export Full Model(s)
 			# Explore Topics:
 			fluidRow(tag("h3", "Visualise Topics:")),
 			# actionButton("btnVisualise", "Visualise"),
@@ -20,6 +21,8 @@ panelTopicModel = function() {
 			),
 			sliderInput(inputId = "numTermsTM", label = "Display Terms",
 				value = 10, min = 5, max = 45, step = 5),
+			# Existing Models:
+			fileInput.rds("loadTMFull", "Load existing Models"),
 			# LDA-Control:
 			fluidRow(tag("h3", "Model Control:")),
 			fluidRow(

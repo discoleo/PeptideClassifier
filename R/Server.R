@@ -42,7 +42,7 @@ server.app = function(input, output, session) {
 	### Init:
 	updateNumericInput(session, "fltGlobalLen",
 		value = options$fltGlobalLen);
-	updateNumericInput(session, "inTMSeed",
+	updateTextInput(session, "inTMSeed",
 		value = asChar(options$seedTM));
 	
 	# Dynamic variable
@@ -485,6 +485,39 @@ server.app = function(input, output, session) {
 			write.csv(xdf, file, row.names = FALSE);
 		}
 	)
+	
+	### Full Models:
+	output$downloadTMFull = downloadHandler(
+		filename = function() {
+			n = values$nClusters;
+			type = input$fltTMType;
+			paste("TMFull.M", type, "_", n, ".rds", sep = "");
+		},
+		content = function(file) {
+			x = values$tmResult;
+			if(is.null(x)) return(NULL);
+			seed = values$seedTM;
+			x = list(TM = x, Seed = seed);
+			saveRDS(x, file);
+		}
+	)
+	observeEvent(input$loadTMFull, {
+		ff = input$loadTMFull;
+		if(is.null(ff)) 
+			return(NULL);
+		#
+		x = readRDS(ff$datapath);
+		if(is.null(x$TM)) return();
+		cat("Finished Loading TMs.\n");
+		# Set parameters:
+		updateNumericInput (session, "numClusters",
+			value = x$TM[[1]]@k);
+		seed = x$Seed;
+		if(is.null(seed)) seed = "";
+		updateTextInput (session, "inTMSeed",
+			value = asChar(seed));
+		values$tmResult = x$TM;
+	})
 	
 	observeEvent(input$inTMDownloadTop, {
 		x = input$inTMDownloadTop;
