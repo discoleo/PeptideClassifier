@@ -83,7 +83,9 @@ server.app = function(input, output, session) {
 		clustSubTree = NULL,
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
 		# Clustering: Diagnostics
-		corClusters  = NULL,
+		clustResultAll = NULL, # List with All Trees
+		clustBrRatios  = NULL, # Branch Ratios (all branches)
+		corClusters    = NULL,
 		# Maths
 		optMath = list(tol = 1E-13),
 		NULLARG = NULL
@@ -799,6 +801,63 @@ server.app = function(input, output, session) {
 	
 	### Clustering: Diagnostics
 	
+	clusterAll = function(xdf, verbose = TRUE) {
+		# Clustering: All Methods
+		d = dist(xdf);
+		if(verbose) cat("Finished Dist; starting Clustering!\n");
+		clustMethods = c("ward.D", "single", "complete", "average",
+			"mcquitty", "median", "centroid", "ward.D2");
+		lstClust = list();
+		for(i in seq_along(clustMethods)) {
+			clustX = hclust(d, method = clustMethods[i]);
+			lstClust[[i]] = clustX;
+		}
+		if(verbose) cat("Finished Clustering!\n");
+		# Add names:
+		names(lstClust) = clustMethods;
+		return(lstClust);
+	}
+	
+	observeEvent(input$btnDx_BranchSummary, {
+		xdf = values$dtmFlt; # Based on DTM;
+		if(is.null(xdf)) return();
+		if(is.null(values$clustResultAll)) {
+			x = clusterAll(xdf);
+			values$clustResultAll = x;
+		} else {
+			x = values$clustResultAll;
+		}
+		# Branch Ratios:
+		values$clustBrRatios = summary.branchRatiosTn(x);
+	})
+	
+	output$tblDx_BranchSummary = DT::renderDT({
+		x = values$clustBrRatios;
+		if(is.null(x) || nrow(x) == 0) return();
+		DT::datatable(x, filter = 'top',
+			options = option.regex(values$reg.Data, varia = list(dom = "tip"))) |>
+		formatRound(names(x)[-1], 2);
+	})
+	
+	### Plot: Branch Ratios
+	output$imgDx_HistBranchRatios = renderPlot({
+		x = values$clustResultAll;
+		if(is.null(x) || length(x) == 0) return();
+		LEN  = length(x);
+		nCol = ceiling(LEN / 2);
+		par.old = par(mfrow = c(2, nCol));
+		on.exit(par(par.old));
+		#
+		for(id in seq(LEN)) {
+			rBr = branch.ratios(x[[id]]);
+			hist(rBr, main = names(x)[[id]], xlab = "Branch Ratio");
+		}
+	})
+	
+	###############
+	
+	### Clustering: Correlations
+	
 	observeEvent(input$btnTreeCor, {
 		# xdf = values$dfDTMData;
 		xdf = values$dtmFlt; # Based on DTM;
@@ -810,16 +869,14 @@ server.app = function(input, output, session) {
 			return();
 		}
 		# Clustering: All Methods
-		d = dist(xdf);
-		cat("Finished Dist; starting Clustering!\n");
-		clustMethods = c("ward.D", "single", "complete", "average",
-			"mcquitty", "median", "centroid", "ward.D2");
+		lst = clusterAll(xdf);
 		lstClust = dendlist();
-		for(i in seq_along(clustMethods)) {
-			clustX   = hclust(d, method = clustMethods[i]);
-			lstClust = dendlist(lstClust, as.dendrogram(clustX));
+		LEN = length(lst); print(str(lst))
+		if(LEN == 0) return();
+		for(i in seq(LEN)) {
+			lstClust = dendlist(lstClust, as.dendrogram(lst[[i]]));
 		}
-		names(lstClust) = clustMethods;
+		names(lstClust) = names(lst);
 		cat("Finished Clustering!\n");
 		cat("Starting cor.dendlist: this takes time!\n");
 		### Correlations:

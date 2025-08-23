@@ -3,6 +3,7 @@
 S3method(dim,dtm)
 S3method(labels,dtm)
 S3method(plot,subtree)
+S3method(summary,branchRatiosTn)
 export(analyseTerm)
 export(branch.ratios)
 export(coverQ)

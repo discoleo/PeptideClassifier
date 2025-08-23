@@ -353,9 +353,30 @@ branch.ratios = function(x, counts = NULL, rm.onlyLeaves = TRUE) {
 	if(rm.onlyLeaves) {
 		isOnlyLeaves = res == 0;
 		res = res[! isOnlyLeaves];
-		attr(res, "PnlyLeaves") = sum(isOnlyLeaves);
+		attr(res, "onlyLeaves") = sum(isOnlyLeaves);
 	}
+	class(res) = c("BranchRatios", class(res));
 	return(res);
+}
+
+
+# Summary: Branch Ratios
+# x = List of Trees;
+#' @export
+summary.branchRatiosTn = function(x) {
+	LEN = length(x);
+	smr = sapply(seq(LEN), function(id) {
+		rBr = branch.ratios(x[[id]]);
+		tmp = summary(rBr);
+		nLeafs = attr(rBr, "onlyLeaves");
+		tmp = c(nLeafs, tmp);
+		names(tmp)[1] = "BrLeaves";
+		return(tmp);
+	});
+	smr = data.frame(t(smr))
+	smr = cbind(names(x), smr);
+	names(smr)[c(1,4,7)] = c("Method", "Q1", "Q3");
+	return(smr);
 }
 
 

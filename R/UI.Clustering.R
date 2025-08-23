@@ -64,8 +64,11 @@ panelClusterDiagnostics = function(img.height = 560) {
 	sidebarLayout(
 	sidebarPanel(
 		h3("Diagnostics:"),
+		actionButton("btnDx_BranchSummary", "Branch Summary"),
 	),
 	mainPanel(
+		DT::DTOutput("tblDx_BranchSummary"),
+		plotOutput("imgDx_HistBranchRatios"),
 		plotOutput("imgDx_HistBranchLeafs"),
 	)
 	)
