@@ -8,13 +8,14 @@
 ##
 ## Clustering Tools
 ##
-## draft v.0.1a
+## draft v.0.1c
 
 
 ### Count Leafs
 # - on each branch;
 count.nodes = function(x) {
 	x = x$merge;
+	if(nrow(x) == 0) return(numeric(0));
 	v = rep(0, nrow(x));
 	v[x[,1] < 0] = 1;
 	hasLeaf = x[,2] < 0;
@@ -356,6 +357,38 @@ branch.ratios = function(x, counts = NULL, rm.onlyLeaves = TRUE) {
 	}
 	return(res);
 }
+
+
+### Size of Leaf-Branches
+# Leaf-Branch = Branch to which a leaf joins;
+#
+# x = Tree;
+# counts = Number of leafs on each branch;
+#' @export
+size.leafBranch = function(x, counts = NULL) {
+	if(is.null(counts)) counts = count.nodes(x);
+	x = x$merge;
+	LEN = nrow(x);
+	if(length(counts) != LEN) {
+		stop("Number of nodes differs!");
+	}
+	if(LEN == 0) return(numeric(0));
+	#
+	idLeaf = which(x[, 1] < 0);
+	res    = rep(1, length(idLeaf));
+	# Real Branches:
+	idPos  = which(x[idLeaf, 2] > 0);
+	if(length(idPos) > 0) {
+		idBranch   = idLeaf[idPos];
+		res[idPos] = counts[x[idBranch, 2]];
+	}
+	# 2nd Col:
+	idLeaf   = which(x[, 2] < 0);
+	idBranch = idLeaf[x[idLeaf, 1] > 0];
+	res = c(res, counts[x[idBranch, 1]]);
+	return(res);
+}
+
 
 ##############
 
