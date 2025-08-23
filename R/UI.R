@@ -106,6 +106,10 @@ getUI = function(version = 2) {
 		tabPanel("Diagnostics", # icon = icon("ClusterDx"),
 			panelClusterDiagnostics()
 		),
+		# Clustering: Dx Correlations
+		tabPanel("Correlation", # icon = icon("ClusterCorrel"),
+			panelClusterCorrelations()
+		),
 		# Generalised Beta Distribution
 		tabPanel("Gen.Beta", # icon = icon("BetaDist"),
 			panelBetaDist()

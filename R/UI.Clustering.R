@@ -60,11 +60,24 @@ panelClustering = function(img.height = 800) {
 
 ### Tab: Diagnostics
 panelClusterDiagnostics = function(img.height = 560) {
-	hImg = as.img.height(img.height);
 	# UI:
 	sidebarLayout(
 	sidebarPanel(
 		h3("Diagnostics:"),
+	),
+	mainPanel(
+		plotOutput("imgDx_HistBranchLeafs"),
+	)
+	)
+}
+
+### Tab: Correlations
+panelClusterCorrelations = function(img.height = 560) {
+	hImg = as.img.height(img.height);
+	# UI:
+	sidebarLayout(
+	sidebarPanel(
+		h3("Correlations:"),
 		fluidRow(
 		column(6, selectDxCorTypes()),
 		column(6, selectDxCorOrder()),
