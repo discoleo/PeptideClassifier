@@ -305,6 +305,62 @@ collect.nodes = function(id, x) {
 	return(nnL);
 }
 
+###############
+
+### Analysis
+
+
+### Leaf Ratios
+# - between number of leafs on each branch;
+# Note:
+# - Centroid: very, very high 3rd Quartile;
+# - Average: high to very high 3rd Quartile;
+# - Many leaves (or minute branches) are added sequentially
+#   to an ever increasing branch!
+#
+# x = Tree;
+# counts = Number of leafs on each branch;
+#' @export
+branch.ratios = function(x, counts = NULL, rm.onlyLeaves = TRUE) {
+	if(is.null(counts)) counts = count.nodes(x);
+	x = x$merge;
+	LEN = nrow(x);
+	if(length(counts) != LEN) {
+		stop("Number of nodes differs!");
+	}
+	if(LEN == 0) return(numeric(0));
+	#
+	res = rep(0, LEN);
+	for(id in seq(LEN)) {
+		if(x[id, 1] > 0) {
+			if(x[id, 2] < 0) {
+				res[id] = counts[id] - 1;
+			} else {
+				tmp2 = counts[x[id, 2]];
+				tmp1 = counts[id] - tmp2;
+				if(tmp1 >= tmp2) {
+					res[id] = tmp1 / tmp2;
+				} else {
+					res[id] = tmp2 / tmp1;
+				}
+			}
+		} else if(x[id, 2] > 0) {
+			# Note: x[id, 1] < 0!
+			res[id] = counts[id] - 1;
+		}
+	}
+	if(rm.onlyLeaves) {
+		isOnlyLeaves = res == 0;
+		res = res[! isOnlyLeaves];
+		attr(res, "PnlyLeaves") = sum(isOnlyLeaves);
+	}
+	return(res);
+}
+
+##############
+
+### Plot
+
 ### Plot Tree/SubTree
 #' @export
 plot.subtree = function(x, mark = TRUE, lwd = 3,
