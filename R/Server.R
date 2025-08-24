@@ -818,6 +818,16 @@ server.app = function(input, output, session) {
 		return(lstClust);
 	}
 	
+	### Cluster: 1 Method
+	observeEvent(input$btnDx_BranchSummary_1, {
+		x = values$clustResult;
+		if(is.null(x)) return();
+		x = list(x);
+		names(x) = x[[1]]$method;
+		values$clustResultAll = x;
+		values$clustBrRatios = summary.branchRatiosTn(x);
+	})
+	### Clusters: All Methods
 	observeEvent(input$btnDx_BranchSummary, {
 		xdf = values$dtmFlt; # Based on DTM;
 		if(is.null(xdf)) return();
@@ -845,7 +855,8 @@ server.app = function(input, output, session) {
 		if(is.null(x) || length(x) == 0) return();
 		LEN  = length(x);
 		nCol = ceiling(LEN / 2);
-		par.old = par(mfrow = c(2, nCol));
+		nRow = if(LEN == 1) 1 else 2;
+		par.old = par(mfrow = c(nRow, nCol));
 		on.exit(par(par.old));
 		#
 		for(id in seq(LEN)) {

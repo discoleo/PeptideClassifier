@@ -59,12 +59,23 @@ panelClustering = function(img.height = 800) {
 }
 
 ### Tab: Diagnostics
-panelClusterDiagnostics = function(img.height = 560) {
+panelClusterDiagnostics = function() {
 	# UI:
 	sidebarLayout(
 	sidebarPanel(
-		h3("Diagnostics:"),
-		actionButton("btnDx_BranchSummary", "Branch Summary"),
+		h3("Diagnostics: Branches"),
+		### Summary: Branches
+		# Summary: Tree computed on the <Cluster>-Tab
+		actionButton("btnDx_BranchSummary_1", "Cluster-Tab"),
+		# Summary: All Clustering Methods
+		actionButton("btnDx_BranchSummary", "All Methods"),
+		NBSP(),
+		tag("b", "Branch Ratio:"),
+		"Ratio between number of leaves on larger branch vs smaller one.",
+		fluidRow(),
+		# Branches with only Leaves:
+		tag("b", "NBr0 ="),
+		"Number of branches with 2 leaves;"
 	),
 	mainPanel(
 		DT::DTOutput("tblDx_BranchSummary"),

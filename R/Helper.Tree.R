@@ -361,16 +361,20 @@ branch.ratios = function(x, counts = NULL, rm.onlyLeaves = TRUE) {
 
 
 # Summary: Branch Ratios
-# x = List of Trees;
+# x    = List of Trees;
+# NBr0 = Branches with only leaves;
+# Note:
+# - Ratio is artificially set to 0, so that they are distinguished easily
+#   from other branches with Ratio = 1;
 #' @export
-summary.branchRatiosTn = function(x) {
+summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 	LEN = length(x);
 	smr = sapply(seq(LEN), function(id) {
 		rBr = branch.ratios(x[[id]]);
 		tmp = summary(rBr);
 		nLeafs = attr(rBr, "onlyLeaves");
 		tmp = c(nLeafs, tmp);
-		names(tmp)[1] = "BrLeaves";
+		names(tmp)[1] = name.Br0;
 		return(tmp);
 	});
 	smr = data.frame(t(smr))
