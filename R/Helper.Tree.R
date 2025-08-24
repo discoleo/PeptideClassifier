@@ -11,6 +11,20 @@
 ## draft v.0.1c
 
 
+as.TreeList = function(x, force = FALSE) {
+	if(inherits(x, "TreeList")) return(x);
+	if(inherits(x, "hclust")) {
+		nm = x$method;
+		x  = list(x); names(x) = nm;
+	} else if(inherits(x, "list")) {
+	} else {
+		warning("Object does NOT seem to be a valid list of trees!");
+		if(! force) return(NULL);
+	}
+	class(x) = c("TreeList", class(x));
+	return(x);
+}
+
 ### Count Leafs
 # - on each branch;
 count.nodes = function(x) {

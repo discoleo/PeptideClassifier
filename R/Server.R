@@ -815,6 +815,7 @@ server.app = function(input, output, session) {
 		if(verbose) cat("Finished Clustering!\n");
 		# Add names:
 		names(lstClust) = clustMethods;
+		lstClust = as.TreeList(lstClust);
 		return(lstClust);
 	}
 	
@@ -839,6 +840,29 @@ server.app = function(input, output, session) {
 		}
 		# Branch Ratios:
 		values$clustBrRatios = summary.branchRatiosTn(x);
+	})
+	
+	# Trees: Save All Trees
+	output$downloadTrees_All = downloadHandler(
+		filename = function() {
+			paste("Tree.All.rds", sep = "");
+		},
+		content = function(file) {
+			x = values$clustResultAll;
+			if(is.null(x)) return();
+			saveRDS(x, file = file);
+		}
+	)
+	# Trees: Load All Trees
+	observeEvent(input$loadTrees_Dx, {
+		ff = input$loadTrees_Dx;
+		if(is.null(ff)) 
+			return(NULL);
+		#
+		x = readRDS(ff$datapath);
+		x = as.TreeList(x);
+		values$clustResultAll = x;
+		values$clustBrRatios  = summary.branchRatiosTn(x);
 	})
 	
 	output$tblDx_BranchSummary = DT::renderDT({

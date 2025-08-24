@@ -22,8 +22,10 @@ panelClustering = function(img.height = 800) {
 		# Plot Orientation:
 		column(6, selectClusterPlotOrientation())
 		),
-		# Generate Tree:
+		### Generate Tree
+		# Existing Tree:
 		fileInput.rds("loadTree", "Load existing Tree"),
+		# New Tree:
 		fluidRow(
 		column(8,
 			actionButton("btnTreeBuild", "Build Tree"),
@@ -69,13 +71,19 @@ panelClusterDiagnostics = function() {
 		actionButton("btnDx_BranchSummary_1", "Cluster-Tab"),
 		# Summary: All Clustering Methods
 		actionButton("btnDx_BranchSummary", "All Methods"),
+		# Download Trees
+		downloadButton("downloadTrees_All", "All Trees"),
 		NBSP(),
+		### Dx Info
 		tag("b", "Branch Ratio:"),
 		"Ratio between number of leaves on larger branch vs smaller one.",
 		fluidRow(),
 		# Branches with only Leaves:
 		tag("b", "NBr0 ="),
-		"Number of branches with 2 leaves;"
+		"Number of branches with 2 leaves;",
+		NBSP(),
+		### Load Trees:
+		fileInput.rds("loadTrees_Dx", "Load existing Trees"),
 	),
 	mainPanel(
 		DT::DTOutput("tblDx_BranchSummary"),
