@@ -39,10 +39,12 @@ ngrams.demo = function(x,
 	}
 	invisible(xall);
 }
-ngrams.select = function(x, type, prefix = c("_", "+", "="),
+ngrams.select = function(x, type, prefix = c("_", "+", "=", "H"),
 		breaks = c(5)) {
 	types = c("2", "2u", "3", "3u", "4", "4u", "Len",
-		"ch3.tot", "ch3.aa", "ch4.tot", "ch4.aa", "ch5.tot", "ch5.aa");
+		"ch3.tot", "ch3.aa", "ch3.hd",
+		"ch4.tot", "ch4.aa", "ch4.hd",
+		"ch5.tot", "ch5.aa", "ch5.hd");
 	iType = match(type, types);
 	isNA  = is.na(iType);
 	if(any(isNA)) warning("Some types are NOT yet implemented: ", type[isNA]);
@@ -97,6 +99,17 @@ ngrams.select = function(x, type, prefix = c("_", "+", "="),
 		n = c(3,4,5);
 		for(id in idChargeAA) {
 			tmp  = ngrams.charged.numeric(pp.charge, n = n[id], prefix = prefix[3]);
+			xall = merge.list(xall, tmp);
+		}
+	}
+	# H-Donors: K/R, S, T, N/Q, (C, H, Y) (?)
+	isHDonor = c("ch3.hd", "ch4.hd", "ch5.hd") %in% type;
+	idHDonor = which(isHDonor);
+	if(length(idHDonor) > 0) {
+		n = c(3,4,5);
+		pp.hd = as.hdonor(x);
+		for(id in idHDonor) {
+			tmp  = ngrams.hbond.numeric(pp.hd, n = n[id], prefix = prefix[4]);
 			xall = merge.list(xall, tmp);
 		}
 	}
@@ -264,6 +277,8 @@ ngrams.charge.numeric = function(x, n = 4, breaks = 5, prefix = "+") {
 	}
 	return(lst);
 }
+
+# [Old approach]
 ngrams.charge.old = function(x, n = 4, breaks = 5, prefix = "+-") {
 	x = lapply(x, function(x) {
 		as.numeric(charToRaw(x)) - 64;
@@ -342,6 +357,32 @@ ngrams.charged.numeric = function(x, n = 4, breaks = 5, prefix = "=") {
 	return(lst);
 }
 
+### H-Bonds
+ngrams.hbond.numeric = function(x, n = 4, breaks = 5, prefix = "H") {
+	if(length(x) == 0) return(x);
+	lst = lapply(x, function(x) {
+		nch = length(x);
+		if(nch <= n) {
+			chAA = sum(x);
+			return(chAA);
+		}
+		lst = c(0, cumsum(x));
+		lst = diff(lst, lag = n);
+		return(lst);
+	})
+	# TODO: breaks;
+	if(! is.null(prefix)) {
+		# n-Gram Length needed to differentiate;
+		prefix = paste0(n, prefix);
+		lst = lapply(lst, function(x) {
+			paste0(prefix, x);
+		});
+	}
+	return(lst);
+}
+
+### Converters
+
 ### Convert to Seq of Charges:
 # Note: N/C-Terminal AA are NOT marked as extra-charged;
 as.charges = function(x) {
@@ -366,7 +407,35 @@ as.charges = function(x) {
 	return(tmp);
 }
 
-# Helper:
+### Convert to Seq of H-Donors:
+# AA = K/R, S, T, N/Q & N-Terminal;
+# TODO: decide on C, H, Y;
+# Note: D, E are only acceptors;
+as.hdonor = function(x) {
+	len = length(x);
+	if(len == 0) return(x);
+	sSz = nchar(x);
+	tmp = lapply(seq(len), function(id) {
+		szSeq = sSz[[id]];
+		if(szSeq == 0) return(numeric(0));
+		seqAA = x[[id]];
+		seqCh = rep(0, szSeq);
+		for(npos in seq(szSeq)) {
+			ch = substr(seqAA, npos, npos);
+			if(ch == 'K' || ch == 'N' || ch == 'Q' ||
+				ch == 'R' || ch == 'S' || ch == 'T') {
+				seqCh[npos] = +1;
+			}
+		}
+		# Up to 2 H can be donated;
+		seqCh[1] = seqCh[1] + 1;
+		return(seqCh);
+	});
+	return(tmp);
+}
+
+
+### Helper:
 
 merge.list = function(x, y) {
 	if(is.null(x)) return(y);
