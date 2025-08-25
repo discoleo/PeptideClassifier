@@ -623,12 +623,22 @@ server.app = function(input, output, session) {
 	### Hierarchical Clustering
 	
 	observeEvent(input$btnTreeBuild, {
-		# Based on DTM-Data!
-		# - which is a filtered version of values$dfFltData;
-		# dtm = values$dfDTMData; # Actual/Raw Data
-		# Based directly on DTM:
-		dtm = values$dtmFlt;
-		if(is.null(dtm)) return();
+		typeSource = input$fltTreeDataSource;
+		if(typeSource == "DTM") {
+			# Based on DTM-Data!
+			# - which is a filtered version of values$dfFltData;
+			# Based directly on DTM:
+			dtm = values$dtmFlt;
+			if(is.null(dtm)) return();
+		} else if(typeSource == "TM") {
+			dtm = values$tmResult[[1]]@gamma;
+			nDocs = nrow(dtm);
+			if(nDocs > 0) rownames(dtm) = as.character(seq(nDocs));
+			print(str(dtm));
+		} else if(typeSource == "Raw") {
+			# dtm = values$dfDTMData; # Actual/Raw Data
+			# TODO
+		}
 		type   = input$fltTreeType;
 		distM  = dist(dtm);
 		# Note: attr(distM, "labels") == NULL!
@@ -759,7 +769,10 @@ server.app = function(input, output, session) {
 	output$downloadTree = downloadHandler(
 		filename = function() {
 			type = input$fltTreeType;
-			paste("Tree.Full.M_", type, ".rds", sep = "");
+			srcT = input$fltTreeDataSource; srcSep = "_";
+			if(srcT == "DTM") { srcT = ""; srcSep = ""; }
+			paste("Tree.Full.", srcT, srcSep,
+				"M_", type, ".rds", sep = "");
 		},
 		content = function(file) {
 			x = values$clustResult;

@@ -33,8 +33,9 @@ panelClustering = function(img.height = 800) {
 		)),
 		NBSP(),
 		fluidRow(
+		column(6, selectClusterSource()),
 		column(6, textInput("inTreeMinSize",
-			"Branches: Min Size", "20")),
+			"Prune Branches: Min", "20")),
 		),
 		# SubTrees:
 		h3("Subtree:"),
@@ -142,6 +143,15 @@ selectClusterType = function(selected = "complete", id = "fltTreeType") {
 			"Ward D"  = "ward.D",  "Ward D2"  = "ward.D2",
 			"Average" = "average", "McQuitty/WPGMA" = "mcquitty",
 			"Median/WPGMC" = "median", "Centroid/UPGMC" = "centroid"),
+		selected = selected);
+}
+
+# Clustering Source:
+# - Source of Data-Matrix for DIST;
+selectClusterSource = function(selected = "DTM", id = "fltTreeDataSource") {
+	selectInput(id, label = "Data Source:",
+		choices = list(
+			"DTM" = "DTM",  "Topic Model" = "TM"),
 		selected = selected);
 }
 
