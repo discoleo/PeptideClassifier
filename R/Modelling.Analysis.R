@@ -2,6 +2,19 @@
 
 ### Analysis
 
+
+### Sub-Topics
+# x = TM model;
+#' @export
+topics.byMainTopic = function(n, x) {
+	idTopic = topics(x, 1); # Only Top Topic;
+	idDocs  = which(idTopic == n);
+	allT = x@gamma[idDocs, ];
+	docs = x@documents[idDocs];
+	rownames(allT) = docs;
+	invisible(allT);
+}
+
 #' @export
 topicSpread = function(x) {
 	spread = apply(posterior(x)$topics, 1, function(z) - sum(z * log(z)));

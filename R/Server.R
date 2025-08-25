@@ -627,14 +627,23 @@ server.app = function(input, output, session) {
 		if(typeSource == "DTM") {
 			# Based on DTM-Data!
 			# - which is a filtered version of values$dfFltData;
-			# Based directly on DTM:
 			dtm = values$dtmFlt;
 			if(is.null(dtm)) return();
 		} else if(typeSource == "TM") {
-			dtm = values$tmResult[[1]]@gamma;
-			nDocs = nrow(dtm);
-			if(nDocs > 0) rownames(dtm) = as.character(seq(nDocs));
+			tm  = values$tmResult;
+			if(is.null(tm)) return();
+			idModel = 1;
+			tm  = tm[[idModel]];
+			dtm = tm@gamma;
+			rownames(dtm) = tm@documents;
 			print(str(dtm));
+		} else if(typeSource == "Tn") {
+			tm  = values$tmResult;
+			if(is.null(tm)) return();
+			idModel = 1;
+			tm  = tm[[idModel]];
+			id  = values$idTopic;
+			dtm = topics.byMainTopic(id, tm);
 		} else if(typeSource == "Raw") {
 			# dtm = values$dfDTMData; # Actual/Raw Data
 			# TODO
@@ -733,7 +742,6 @@ server.app = function(input, output, session) {
 		if(is.null(x)) return(NULL);
 		ids = as.integer(x$labels)[x$order];
 		# TODO: check if Data-source correct!
-		# TODO: still errors/inconsistencies;
 		doc = labels.dtm(values$dtmFlt)[ids];
 		doc = as.integer(doc);
 		dfx = values$dfDTMData;
