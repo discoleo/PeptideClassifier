@@ -44,7 +44,9 @@ ngrams.select = function(x, type, prefix = c("_", "+", "=", "H"),
 	types = c("2", "2u", "3", "3u", "4", "4u", "Len",
 		"ch3.tot", "ch3.aa", "ch3.hd",
 		"ch4.tot", "ch4.aa", "ch4.hd",
-		"ch5.tot", "ch5.aa", "ch5.hd");
+		"ch5.tot", "ch5.aa", "ch5.hd",
+		"ch6.tot", "ch6.aa", "ch6.hd"
+		);
 	iType = match(type, types);
 	isNA  = is.na(iType);
 	if(any(isNA)) warning("Some types are NOT yet implemented: ", type[isNA]);
@@ -77,39 +79,38 @@ ngrams.select = function(x, type, prefix = c("_", "+", "=", "H"),
 		tmp.gr = as.list(len.pp(x, breaks = breaks[1]));
 		xall   = merge.list(xall, tmp.gr);
 	}
+	# All Other:
+	NGR = c(3,4,5,6);
 	# Charges:
 	isCh = grepl("^ch", type);
 	if(! any(isCh)) return(xall);
 	type = type[isCh];
 	# Total Charge:
 	pp.charge  = as.charges(x);
-	isChargeTt = c("ch3.tot", "ch4.tot", "ch5.tot") %in% type;
+	isChargeTt = c("ch3.tot", "ch4.tot", "ch5.tot", "ch6.tot") %in% type;
 	idChargeTt = which(isChargeTt);
 	if(length(idChargeTt) > 0) {
-		n = c(3,4,5);
 		for(id in idChargeTt) {
-			tmp  = ngrams.charge.numeric(pp.charge, n = n[id], prefix = prefix[2]);
+			tmp  = ngrams.charge.numeric(pp.charge, n = NGR[id], prefix = prefix[2]);
 			xall = merge.list(xall, tmp);
 		}
 	}
 	# Charged AA:
-	isChargeAA = c("ch3.aa", "ch4.aa", "ch5.aa") %in% type;
+	isChargeAA = c("ch3.aa", "ch4.aa", "ch5.aa", "ch6.aa") %in% type;
 	idChargeAA = which(isChargeAA);
 	if(length(idChargeAA) > 0) {
-		n = c(3,4,5);
 		for(id in idChargeAA) {
-			tmp  = ngrams.charged.numeric(pp.charge, n = n[id], prefix = prefix[3]);
+			tmp  = ngrams.charged.numeric(pp.charge, n = NGR[id], prefix = prefix[3]);
 			xall = merge.list(xall, tmp);
 		}
 	}
 	# H-Donors: K/R, S, T, N/Q, (C, H, Y) (?)
-	isHDonor = c("ch3.hd", "ch4.hd", "ch5.hd") %in% type;
+	isHDonor = c("ch3.hd", "ch4.hd", "ch5.hd", "ch6.hd") %in% type;
 	idHDonor = which(isHDonor);
 	if(length(idHDonor) > 0) {
-		n = c(3,4,5);
 		pp.hd = as.hdonor(x);
 		for(id in idHDonor) {
-			tmp  = ngrams.hbond.numeric(pp.hd, n = n[id], prefix = prefix[4]);
+			tmp  = ngrams.hbond.numeric(pp.hd, n = NGR[id], prefix = prefix[4]);
 			xall = merge.list(xall, tmp);
 		}
 	}

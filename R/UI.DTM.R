@@ -71,7 +71,10 @@ checkboxNGrams = function(width = 360, inline = TRUE) {
 			"4 Gr-Charge" = "ch4.tot", "4 Gr-Charged AA" = "ch4.aa",
 				"4 H-Donor" = "ch4.hd",
 			"5 Gr-Charge" = "ch5.tot", "5 Gr-Charged AA" = "ch5.aa",
-				"5 H-Donor" = "ch5.hd"),
+				"5 H-Donor" = "ch5.hd",
+			"6 Gr-Charge" = "ch6.tot", "6 Gr-Charged AA" = "ch6.aa",
+				"6 H-Donor" = "ch6.hd"
+			),
 		selected = c("2", "2u", "3u", "Len",
 			"ch4.tot", "ch4.aa", "ch4.hd")
 	)
