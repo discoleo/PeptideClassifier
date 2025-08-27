@@ -12,11 +12,11 @@ The main purpose of this package is to facilitate the exploration of sets of pep
 
 The peptides are split into various n-Grams. Under the **DTM** tab are the controls to construct a DocumentTermMatrix, which will be used during the subsequent steps.
 
-Topic modelling using LDA is available under the **Topics** tab.
+Topic modelling using LDA is available under the **Topics** tab. Peptides binding to the same site on the same receptor would correspond to a specific "topic". Correlated Topic Modeling may be useful to detect more complicated binding sites or homologous receptors with slight variation of the binding site.
 
 Hierarchical clustering can be performed under the **Clustering** tab. Previously saved clusters/trees can be loaded into the app, thus avoiding expensive computation times.
 
-The **Diagnostics** tab enables the comparison of the various hierarchical clustering algorithms. Warning: takes hours to compute!
+The **Diagnostics** and **Correlation** tabs enable the comparison of the various hierarchical clustering algorithms. Warning: Correlation between trees takes hours to compute!
 
 
 ### Rational
@@ -40,13 +40,22 @@ Note: the chemical descriptors are calculated on n-Grams of specific sizes. Thes
 
 ### Examples
 
-A dataset with anti-inflammatory peptides is available in the /inst/examples folder. A number of precomputed trees is also available in this folder.
+A dataset with anti-inflammatory peptides (AIP) is available in the /inst/examples folder. A number of precomputed trees is also available in this folder.
 
-Note: The dataset was copied from the BertAIP project on GitHub. The description for that project states that BertAIP is a bidirectional encoder representation from transformers-based tool for the prediction of anti-inflammatory peptides.
+Note:
+- The dataset was copied from the BertAIP project on GitHub. The description for that project states that BertAIP is a bidirectional encoder representation from transformers-based tool for the prediction of anti-inflammatory peptides (see also Ref below).
 > https://github.com/ying-jc/BertAIP
+- The training and testing datasets have been joined together (see file AIP.all_dataset.fasta).
+- The original training dataset is also available on its own (file AIP.train_dataset.fast).
+- Although epitopes bind directionally in the groove of the MHC I & MHC II molecules, the corresponding TCRs may each be oriented differently.
+- MHC-Epitope-TCR Complexes: may be a very specialised example, which is less suitable for the more general purpose of this application. But the datasets were readily available and fit my interests in immunology.
+
+The construction of the dataset is described in:
+- Xu T, Wang Q, Yang Z, Ying J. A BERT-based approach for identifying anti-inflammatory peptides using sequence information. Heliyon. 2024 Jun 13;10(12):e32951. PMID: 38988537.
+> https://doi.org/10.1016/j.heliyon.2024.e32951.
 
 
 ## Authors
 
-1. Author, Maintainer: L. Mada
+1. PeptideClassifier: Author, Maintainer: L. Mada
 
