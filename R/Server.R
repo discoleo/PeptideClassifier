@@ -428,10 +428,18 @@ server.app = function(input, output, session) {
 	#####################
 	### Clusters / Topics
 	
+	# TM Model: valid ID;
 	getModel = function(nMod, idModel = 1) {
 		idModel = if(nMod > 1) min(nMod, values$idModel)
 			else idModel;
 		return(idModel);
+	}
+	getModelTM = function() {
+		tm  = values$tmResult;
+		if(is.null(tm)) return(NULL);
+		idModel = getModel(length(tm));
+		tm  = tm[[idModel]];
+		return(tm);
 	}
 	
 	observeEvent(input$numTMClusters, {
@@ -630,20 +638,23 @@ server.app = function(input, output, session) {
 			dtm = values$dtmFlt;
 			if(is.null(dtm)) return();
 		} else if(typeSource == "TM") {
-			tm  = values$tmResult;
+			tm  = getModelTM();
 			if(is.null(tm)) return();
-			idModel = 1;
-			tm  = tm[[idModel]];
 			dtm = tm@gamma;
 			rownames(dtm) = tm@documents;
 			print(str(dtm));
 		} else if(typeSource == "Tn") {
-			tm  = values$tmResult;
+			tm  = getModelTM();
 			if(is.null(tm)) return();
-			idModel = 1;
-			tm  = tm[[idModel]];
 			id  = values$idTopic;
 			dtm = topics.byMainTopic(id, tm);
+		} else if (typeSource == "DTM.Tn") {
+			tm  = getModelTM();
+			if(is.null(tm)) return();
+			id  = values$idTopic;
+			idD = docs.byTopic(id, tm);
+			dtm = values$dtmFlt;
+			dtm = dtm[idD, ];
 		} else if(typeSource == "Raw") {
 			# dtm = values$dfDTMData; # Actual/Raw Data
 			# TODO

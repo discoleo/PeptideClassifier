@@ -46,7 +46,7 @@ Note:
 - The dataset was copied from the BertAIP project on GitHub. The description for that project states that BertAIP is a bidirectional encoder representation from transformers-based tool for the prediction of anti-inflammatory peptides (see also Ref below).
 > https://github.com/ying-jc/BertAIP
 - The training and testing datasets have been joined together (see file AIP.all_dataset.fasta).
-- The original training dataset is also available on its own (file AIP.train_dataset.fast).
+- The original training dataset is also available on its own (file AIP.train_dataset.fasta); but note that this application is **not** used for such predictions.
 - Although epitopes bind directionally in the groove of the MHC I & MHC II molecules, the corresponding TCRs may each be oriented differently.
 - MHC-Epitope-TCR Complexes: may be a very specialised example, which is less suitable for the more general purpose of this application. But the datasets were readily available and fit my interests in immunology.
 

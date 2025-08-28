@@ -151,8 +151,8 @@ selectClusterType = function(selected = "complete", id = "fltTreeType") {
 selectClusterSource = function(selected = "DTM", id = "fltTreeDataSource") {
 	selectInput(id, label = "Data Source:",
 		choices = list(
-			"DTM" = "DTM",  "Topic Model" = "TM",
-			"Topic n" = "Tn"),
+			"DTM" = "DTM", "Topic Model" = "TM",
+			"Topic n" = "Tn", "DTM for Tn" = "DTM.Tn"),
 		selected = selected);
 }
 

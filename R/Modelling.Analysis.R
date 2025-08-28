@@ -16,6 +16,17 @@ topics.byMainTopic = function(n, x) {
 }
 
 #' @export
+docs.byTopic = function(n, x, as.numeric = TRUE) {
+	idTopic = topics(x, 1); # Only Top Topic;
+	idDocs  = which(idTopic == n);
+	docs = x@documents[idDocs];
+	if(as.numeric) docs = as.integer(docs);
+	return(docs);
+}
+
+### Proper Analysis
+
+#' @export
 topicSpread = function(x) {
 	spread = apply(posterior(x)$topics, 1, function(z) - sum(z * log(z)));
 	mean(spread);
