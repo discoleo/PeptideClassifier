@@ -451,3 +451,79 @@ plot.subtree = function(x, mark = TRUE, lwd = 3,
 	invisible(c(xPos, height));
 }
 
+### Aggregate Branches
+# x  = Tree;
+# by = Attribute/Value of leaves to aggregate;
+#' @export
+aggregate.tree = function(x, by, FUN, ...) {
+	UseMethod("aggregate.tree");
+}
+
+#' @exportS3Method aggregate.tree hclust
+aggregate.tree.hclust = function(x, by, FUN = NULL, ...) {
+	vb = by;
+	if(! is.null(x$labels)) {
+		id = as.numeric(x$labels);
+		vb = vb[id];
+	}
+	iCL = as.factor(vb);
+	nCL = length(levels(iCL));
+	iCL = as.numeric(iCL);
+	x = x$merge;
+	n = nrow(x);
+	# Result:
+	m = matrix(0, nrow = nCL, ncol = n);
+	if(n == 0) return(m);
+	for(id in seq(n)) {
+		idN = x[id, 1];
+		if(idN < 0) {
+			idC = iCL[- idN];
+			m[idC, id] = m[idC, id] + 1;
+		} else {
+			m[, id] = m[, id] + m[, idN];
+		}
+		idN = x[id, 2];
+		if(idN < 0) {
+			idC = iCL[- idN];
+			m[idC, id] = m[idC, id] + 1;
+		} else {
+			m[, id] = m[, id] + m[, idN];
+		}
+	}
+	if(is.null(FUN)) return(m);
+	m = apply(m, 2, FUN);
+	return(m);
+}
+
+### Edge IDs
+# x = Tree;
+#' @export
+as.edgeId = function(x) {
+	nn  = x$merge;
+	LEN = nrow(nn);
+	lst = list();
+	if(LEN == 0) return(lst);
+	# Warning: naive implementation; NO bound checks;
+	for(id in seq(LEN)) {
+		tmp = c();
+		lst[[id]] = numeric(0);
+		idS = nn[id, 1];
+		if(idS < 0) {
+			tmp = c(tmp, idS, id);
+		} else {
+			tmp = c(tmp, lst[[idS]], id);
+			lst[[idS]] = numeric(0); # clean-up;
+		}
+		idS = nn[id, 2];
+		# Note: reverted
+		if(idS < 0) {
+			tmp = c(idS, id, tmp);
+		} else {
+			tmp = c(lst[[idS]], id, tmp);
+			lst[[idS]] = numeric(0);
+		}
+		lst[[id]] = tmp;
+	}
+	lst = lst[[LEN]];
+	return(lst);
+}
