@@ -68,6 +68,7 @@ analyseTerm = function(x, data) {
 
 # x    = Topic Model;
 # data = Original Data;
+#' @export
 summary.topics = function(x, data) {
 	idTopic = topics(x, 1);
 	idDocs  = as.integer(x@documents);

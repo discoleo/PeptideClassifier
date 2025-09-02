@@ -466,9 +466,17 @@ aggregate.tree.hclust = function(x, by, FUN = NULL, ...) {
 		id = as.numeric(x$labels);
 		vb = vb[id];
 	}
+	# Levels:
 	iCL = as.factor(vb);
-	iLv = as.numeric(levels(iCL));
-	nCL = length(iLv);
+	lvl = levels(iCL);
+	if(is.numeric(vb)) {
+		if(is.integer(vb)) {
+			lvl = as.integer(lvl);
+		} else {
+			lvl = as.numeric(lvl);
+		}
+	}
+	nCL = length(lvl);
 	iCL = as.integer(iCL);
 	x = x$merge;
 	n = nrow(x);
@@ -494,10 +502,10 @@ aggregate.tree.hclust = function(x, by, FUN = NULL, ...) {
 	# Original Value:
 	if(! is.null(FUN)) {
 		m = apply(m, 2, FUN);
-		m = iLv[m];
+		m = lvl[m];
 	}
 	attr(m, "col") = vb;
-	attr(m, "levels") = iLv;
+	attr(m, "levels") = lvl;
 	return(m);
 }
 
