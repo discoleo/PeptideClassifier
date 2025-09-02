@@ -546,6 +546,7 @@ as.edgeId = function(x) {
 
 ### Coloured Dendrogram
 # TODO: some rework of Midpoint;
+#' @export
 as.dendrogramCol = function(x, col, scale = 1) {
 	cn  = count.nodes(x);
 	nn  = x$merge;
@@ -604,6 +605,80 @@ as.dendrogramCol = function(x, col, scale = 1) {
 		attr(tmp, "midpoint") = midB;
 		attr(tmp, "midID")    = (pp1 + pp2) / 2;
 		attr(tmp, "edgePar")  = list(col = col[id]);
+		lst[[id]] = tmp;
+	}
+	lst = lst[[LEN]];
+	class(lst) = "dendrogram";
+	return(lst);
+}
+
+
+### Identify Solitary Leafs
+# x   = Object of type hclust;
+# col = Colour used for solitary leaves;
+#     or 2 colours for solitary vs 2-Leaf branch;
+#' @export
+as.dendrogramLeaf = function(x, col, h.leaf = 0) {
+	nn  = x$merge;
+	LEN = nrow(nn);
+	lst = list();
+	if(LEN == 0) return(lst);
+	if(length(col) == 1) col = c(L1 = col, L2 = NA);
+	cn = count.nodes(x);
+	# Warning: naive implementation; NO bound checks;
+	asLeaf = function(id, col = NA) {
+		tmp = list(id);
+		attr(tmp, "label")   = as.character(id);
+		attr(tmp, "members") = 1;
+		attr(tmp, "height")  = h.leaf;
+		attr(tmp, "leaf")    = TRUE;
+		if(! is.na(col)) {
+			attr(tmp, "nodePar") = list(col = col);
+			attr(tmp, "edgePar") = list(col = col);
+		}
+		return(tmp);
+	}
+	for(id in seq(LEN)) {
+		tmp = list();
+		idS = nn[id, 1];
+		isL2 = FALSE;
+		if(idS < 0) {
+			if(nn[id, 2] < 0) isL2 = TRUE; # 2 Leaves;
+			colL = if(isL2) col[2] else col[1];
+			tmp[[1]] = asLeaf(-idS, colL);
+			pp1  = match(- idS, x$order);
+		} else {
+			tmp[[1]]   = lst[[idS]];
+			lst[[idS]] = numeric(0);
+			pp1 = attr(tmp[[1]], "midID");
+		}
+		idS = nn[id, 2];
+		if(idS < 0) {
+			colL = if(isL2) col[2] else col[1];
+			tmp[[2]] = asLeaf(-idS, colL);
+			pp2  = match(- idS, x$order);
+		} else {
+			tmp[[2]]   = lst[[idS]];
+			lst[[idS]] = numeric(0);
+			pp2 = attr(tmp[[2]], "midID");
+		}
+		if(pp1 > pp2) {
+			tmpN = tmp[[1]]; tmp[[1]] = tmp[[2]]; tmp[[2]] = tmpN;
+		}
+		# MidPoint:
+		midL = attr(tmp[[1]], "members");
+		midR = attr(tmp[[2]], "members");
+		mid1 = if(midL <= 2) 0.5
+			else attr(tmp[[1]], "midpoint");
+		mid2 = if(midR <= 1) -0.5
+			else if(midR == 2) 0
+			else attr(tmp[[2]], "midpoint");
+		midB = (mid1 + midL + mid2) / 2; # Old: (cn[id] - 1) / 2;
+		attr(tmp, "members")  = cn[id];
+		attr(tmp, "height")   = x$height[id];
+		attr(tmp, "midpoint") = midB;
+		attr(tmp, "midID")    = (pp1 + pp2) / 2;
+		# attr(tmp, "edgePar")  = list(col = col[id]);
 		lst[[id]] = tmp;
 	}
 	lst = lst[[LEN]];
