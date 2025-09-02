@@ -467,8 +467,9 @@ aggregate.tree.hclust = function(x, by, FUN = NULL, ...) {
 		vb = vb[id];
 	}
 	iCL = as.factor(vb);
-	nCL = length(levels(iCL));
-	iCL = as.numeric(iCL);
+	iLv = as.numeric(levels(iCL));
+	nCL = length(iLv);
+	iCL = as.integer(iCL);
 	x = x$merge;
 	n = nrow(x);
 	# Result:
@@ -490,8 +491,13 @@ aggregate.tree.hclust = function(x, by, FUN = NULL, ...) {
 			m[, id] = m[, id] + m[, idN];
 		}
 	}
-	if(is.null(FUN)) return(m);
-	m = apply(m, 2, FUN);
+	# Original Value:
+	if(! is.null(FUN)) {
+		m = apply(m, 2, FUN);
+		m = iLv[m];
+	}
+	attr(m, "col") = vb;
+	attr(m, "levels") = iLv;
 	return(m);
 }
 
@@ -516,6 +522,7 @@ as.edgeId = function(x) {
 		}
 		idS = nn[id, 2];
 		# Note: reverted
+		# TODO: sometimes has normal orientation;
 		if(idS < 0) {
 			tmp = c(idS, id, tmp);
 		} else {
@@ -537,6 +544,7 @@ as.dendrogramCol = function(x, col, scale = 1) {
 	LEN = nrow(nn);
 	lst = list();
 	if(LEN == 0) return(lst);
+	colN = attr(col, "col");
 	# Warning: naive implementation; NO bound checks;
 	asLeaf = function(id, col = NULL) {
 		tmp = list(id);
@@ -544,9 +552,11 @@ as.dendrogramCol = function(x, col, scale = 1) {
 		attr(tmp, "members") = 1;
 		attr(tmp, "height")  = 0;
 		attr(tmp, "leaf")    = TRUE;
-		if(! is.null(col)) {
-			attr(tmp, "nodePar") = list(col = col);
+		if(! is.null(colN)) {
+			col = colN[id];
 		}
+		attr(tmp, "nodePar") = list(col = col);
+		attr(tmp, "edgePar") = list(col = col);
 		return(tmp);
 	}
 	for(id in seq(LEN)) {
