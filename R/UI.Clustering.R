@@ -37,6 +37,8 @@ panelClustering = function(img.height = 800) {
 		column(6, textInput("inTreeMinSize",
 			"Prune Branches: Min", "20")),
 		),
+		# Value is set in Server:
+		textInput("inTreeColLeaf", "Colour: Solitary Leaves", ""),
 		# SubTrees:
 		h3("Subtree:"),
 		fluidRow(

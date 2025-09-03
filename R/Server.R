@@ -25,6 +25,9 @@ server.app = function(input, output, session) {
 		highlight = TRUE,  # Highlight Search Term
 		# Topic Models:
 		seedTM    = NULL,  # Seed: 123
+		### Trees:
+		# Solitary Leaf vs L2-Leaf;
+		colTreeLeaves = c(L1 = "#FF886490", L2 = "#6432FFB8"),
 		# TODO
 		NULL
 	);
@@ -38,12 +41,21 @@ server.app = function(input, output, session) {
 		if(is.null(x)) return("");
 		return(as.character(x));
 	}
+	asCollapsed = function(x, collapse = "; ") {
+		if(is.null(x)) return("");
+		x = x[! is.na(x)];
+		if(length(x) == 0) return("");
+		x = paste0(x, collapse = collapse);
+		return(x);
+	}
 	
 	### Init:
 	updateNumericInput(session, "fltGlobalLen",
 		value = options$fltGlobalLen);
 	updateTextInput(session, "inTMSeed",
 		value = asChar(options$seedTM));
+	updateTextInput(session, "inTreeColLeaf",
+		value = asCollapsed(options$colTreeLeaves));
 	
 	# Dynamic variable
 	values = reactiveValues(
@@ -81,6 +93,7 @@ server.app = function(input, output, session) {
 		# Hierarchical Clusters
 		clustResult  = NULL,
 		clustSubTree = NULL,
+		colTreeLeaves  = c(NA, NA),
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
@@ -690,8 +703,13 @@ server.app = function(input, output, session) {
 			hClust = collapse.tree(size, tree = hClust);
 		}
 		# Plot:
-		orientH = input$fltTreePlotOrientation;
-		hClust  = as.dendrogram(hClust);
+		orientH   = input$fltTreePlotOrientation;
+		colLeaves = values$colTreeLeaves;
+		if(! is.null(colLeaves) && ! all(is.na(colLeaves))) {
+			hClust = as.dendrogramLeaf(hClust, col = colLeaves);
+		} else {
+			hClust = as.dendrogram(hClust);
+		}
 		plot(hClust, horiz = orientH);
 	})
 	
@@ -829,6 +847,26 @@ server.app = function(input, output, session) {
 				"see the DTM tab.");
 		}
 		return(msg);
+	})
+	
+	### Colours:
+	observeEvent(input$inTreeColLeaf, {
+		val = input$inTreeColLeaf;
+		if(is.null(val) || nchar(val) == 0) {
+			values$colTreeLeaves = c(NA, NA);
+			return();
+		}
+		val = strsplit(val, "[; ]+");
+		val = val[[1]];
+		LEN = length(val);
+		if(LEN == 0) {
+			values$colTreeLeaves = c(NA, NA);
+			return();
+		}
+		isNum = grepl("^[0-9]+$", val);
+		if(all(isNum)) val = as.integer(val);
+		if(length(val) == 1) val = c(L1 = val, L2 = NA);
+		values$colTreeLeaves = val;
 	})
 	
 	### Clustering: Diagnostics
