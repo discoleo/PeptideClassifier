@@ -93,7 +93,7 @@ server.app = function(input, output, session) {
 		# Hierarchical Clusters
 		clustResult  = NULL,
 		clustSubTree = NULL,
-		colTreeLeaves  = c(NA, NA),
+		colTreeLeaves  = options$colTreeLeaves,
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
@@ -850,7 +850,7 @@ server.app = function(input, output, session) {
 	})
 	
 	### Colours:
-	observeEvent(input$inTreeColLeaf, {
+	observeEvent(input$btnTreeColLeaves, {
 		val = input$inTreeColLeaf;
 		if(is.null(val) || nchar(val) == 0) {
 			values$colTreeLeaves = c(NA, NA);

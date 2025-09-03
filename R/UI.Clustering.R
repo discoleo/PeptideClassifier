@@ -30,6 +30,7 @@ panelClustering = function(img.height = 800) {
 		column(8,
 			actionButton("btnTreeBuild", "Build Tree"),
 			actionButton("btnTreePruneSize", "Prune"),
+			actionButton("btnTreeColLeaves", "L-Color"),
 		)),
 		NBSP(),
 		fluidRow(
