@@ -1,6 +1,6 @@
 Package: PeptideClassifier
 Title: Interactive Shiny App to Browse and Classify Peptides
-Version: 0.2.2
+Version: 0.2.4
 Authors@R:
     person("Leonard", "Mada", "leo.mada@umft.ro", role = c("aut", "cre"))
 Depends: shiny, DT,
