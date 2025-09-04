@@ -95,6 +95,7 @@ server.app = function(input, output, session) {
 		clustSubTree = NULL,
 		colTreeLeaves  = options$colTreeLeaves,
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
+		adjTreeHeight  = TRUE, # Remove Inversions
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
 		clustBrRatios  = NULL, # Branch Ratios (all branches)
@@ -698,6 +699,10 @@ server.app = function(input, output, session) {
 	output$imgTree = renderPlot({
 		hClust = values$clustResult;
 		if(is.null(hClust)) return();
+		# Remove Inversions:
+		if(values$adjTreeHeight) {
+			hClust = adjust.height.hclust(hClust);
+		}
 		size = values$pruneTreeSize;
 		if(size != 0) {
 			hClust = collapse.tree(size, tree = hClust);

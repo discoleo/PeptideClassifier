@@ -429,6 +429,39 @@ size.leafBranch = function(x, counts = NULL) {
 }
 
 
+### Remove Inversions
+# - Adjust height in order to remove inversions;
+# x = Tree (hclust);
+# scale, pow = affect how much the inverted branch will descend;
+#' @export
+adjust.height = function(x, ...) {
+	UseMethod("adjust.height");
+}
+
+#' @exportS3Method adjust.height hclust
+adjust.height.hclust = function(x, scale = 1/16, pow = 1) {
+	nn  = x$merge;
+	LEN = nrow(nn);
+	Hm = diff(range(x$height));
+	Hm = Hm * scale;
+	hasPow = pow != 1;
+	for(id in seq(LEN, 1)) {
+		h   = x$height[id];
+		idN = nn[id, ];
+		idN = idN[idN > 0];
+		if(length(idN) > 0) {
+			isBig = x$height[idN] > h;
+			if(any(isBig)) {
+				idN = idN[isBig];
+				div = LEN + 1 - id;
+				if(hasPow) div = div^pow;
+				x$height[idN] = h - Hm / div;
+			}
+		}
+	}
+	invisible(x);
+}
+
 ##############
 
 ### Plot
