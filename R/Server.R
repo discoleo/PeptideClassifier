@@ -23,11 +23,14 @@ server.app = function(input, output, session) {
 		reg.Data  = TRUE,  # Regex for Data-Table
 		reg.PP    = TRUE,  # Regex for Epitopes-Table
 		highlight = TRUE,  # Highlight Search Term
+		# PP: Analysis
+		Breaks_PP_Length = c(0, 9, 19, 29, 39, 100),
 		# Topic Models:
 		seedTM    = NULL,  # Seed: 123
 		### Trees:
 		# Solitary Leaf vs L2-Leaf;
 		colTreeLeaves = c(L1 = "#FF886490", L2 = "#6432FFB8"),
+		adjTreeHeight = TRUE, # Remove Inversions
 		# TODO
 		NULL
 	);
@@ -80,7 +83,7 @@ server.app = function(input, output, session) {
 		idDocRm   = NULL,   # Docs removed following TF-IDF
 		isDocRm   = FALSE,  # Are there any Docs Removed?
 		# Categories:
-		brkLen    = c(0, 9, 19, 29, 39, 100), # PP-Length
+		brkLen    = options$Breaks_PP_Length, # PP-Length
 		# Topic Models
 		nClusters   = 0,
 		seedTM      = NULL,  # Seed for TMs;
@@ -95,7 +98,7 @@ server.app = function(input, output, session) {
 		clustSubTree = NULL,
 		colTreeLeaves  = options$colTreeLeaves,
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
-		adjTreeHeight  = TRUE, # Remove Inversions
+		adjTreeHeight  = options$adjTreeHeight, # Remove Inversions
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
 		clustBrRatios  = NULL, # Branch Ratios (all branches)
