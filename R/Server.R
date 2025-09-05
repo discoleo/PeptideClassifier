@@ -645,6 +645,8 @@ server.app = function(input, output, session) {
 		formatRound("ChargesN", 2);
 	})
 	
+	################
+	
 	### Hierarchical Clustering
 	
 	observeEvent(input$btnTreeBuild, {
@@ -655,12 +657,14 @@ server.app = function(input, output, session) {
 			dtm = values$dtmFlt;
 			if(is.null(dtm)) return();
 		} else if(typeSource == "TM") {
+			# All Topics:
 			tm  = getModelTM();
 			if(is.null(tm)) return();
 			dtm = tm@gamma;
 			rownames(dtm) = tm@documents;
 			print(str(dtm));
 		} else if(typeSource == "Tn") {
+			# Specific Topic
 			tm  = getModelTM();
 			if(is.null(tm)) return();
 			id  = values$idTopic;

@@ -170,7 +170,7 @@ collapse.tree = function(n, tree) {
 			if(hasLeafs) nposQ = nposQ + 1; # Next node in Queue;
 		} else {
 			# Probably the Root-Node < n;
-			# TODO: re-design / keep node & makes Leafs;
+			# TODO: re-design / keep node & make Leaves;
 			print("Root fails.")
 			nposQ = nposQ + 1;
 			nmN   = paste0("L", id);
@@ -196,7 +196,10 @@ collapse.tree = function(n, tree) {
 	nnT = sort(unique(nnT));
 	tree$merge = x;
 	tree = subtree.fromRoot(nnT, tree);
-	# TODO: save collapsed Nodes (nnL list);
+	# Collapsed Nodes (nnL list);
+	# TODO: convert nnL to matrix form;
+	attr(tree, "nodes") = nnL;
+	class(tree) = c("collapsedTree", class(tree));
 	return(tree);
 }
 
@@ -652,6 +655,11 @@ as.dendrogramCol = function(x, col, scale = 1) {
 #     or 2 colours for solitary vs 2-Leaf branch;
 #' @export
 as.dendrogramLeaf = function(x, col, h.leaf = 0) {
+	if(inherits(x, "collapsedTree")) {
+		# TODO:
+		warning("Collapsed Tree not yet implemented!");
+		return(as.dendrogram(x));
+	}
 	nn  = x$merge;
 	LEN = nrow(nn);
 	lst = list();
