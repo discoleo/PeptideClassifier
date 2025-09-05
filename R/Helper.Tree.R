@@ -8,7 +8,7 @@
 ##
 ## Clustering Tools
 ##
-## draft v.0.1c
+## draft v.0.1d
 
 
 as.TreeList = function(x, force = FALSE) {
@@ -27,6 +27,7 @@ as.TreeList = function(x, force = FALSE) {
 
 ### Count Leafs
 # - on each branch;
+#' @export
 count.nodes = function(x) {
 	x = x$merge;
 	if(nrow(x) == 0) return(numeric(0));
@@ -40,6 +41,61 @@ count.nodes = function(x) {
 		if(x[i1,2] > 0) v[i1] = v[i1] + v[x[i1,2]];
 	}
 	return(v);
+}
+
+### Count Leaves
+# - on branches where another Leaf is joining;
+# Note: Branch with 2 leaves = 0;
+# nc = Count of leaves on a branch;
+#' @export
+count.jLeaves = function(x, nc = NULL) {
+	if(is.null(nc)) {
+		nC = count.jLeaves0(x);
+		return(nC);
+	}
+	x = x$merge;
+	LEN = nrow(x);
+	if(LEN == 0) return(integer(0));
+	nL  = integer(0);
+	for(id in seq(LEN)) {
+		if(x[id,1] < 0) {
+			tmp = nc[id] - 1;
+			if(tmp == 1) tmp = 0;
+			nL = c(nL, tmp);
+		} else if(x[id,2] < 0) {
+			tmp = nc[id] - 1;
+			nL = c(nL, tmp);
+		}
+	}
+	return(nL);
+}
+count.jLeaves0 = function(x) {
+	# One-pass algorithm;
+	x = x$merge;
+	LEN = nrow(x);
+	if(LEN == 0) return(integer(0));
+	# Number of Leaves:
+	nL = rep(0, LEN);
+	hasLeaf = rep(FALSE, LEN);
+	for(id in seq(LEN)) {
+		n1 = x[id,1]; n2 = x[id,2];
+		if(n1 < 0) {
+			hasLeaf[id] = TRUE;
+			if(n2 > 0) {
+				nL[id] = nL[n2] + 1;
+			} else nL[id] = 2;
+		} else {
+			if(n2 < 0) {
+				hasLeaf[id] = TRUE;
+				nL[id] = nL[n1] + 1;
+			} else {
+				nL[id] = nL[n1] + nL[n2];
+			}
+		}
+	}
+	nL = nL[hasLeaf];
+	nL = nL + ifelse(nL == 2, -2, -1);
+	return(nL);
 }
 
 
