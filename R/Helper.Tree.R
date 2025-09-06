@@ -26,6 +26,12 @@ as.TreeList = function(x, force = FALSE) {
 	return(x);
 }
 
+
+### Tree Topology
+
+# Leaf-Branch = Branch to which at least 1 leaf joins;
+
+
 ### Count Leafs
 # - on each branch;
 # Note: full count of leaves for ALL nodes;
@@ -46,7 +52,7 @@ count.nodes = function(x) {
 }
 
 ### Count Leaves
-# - on branches where another Leaf is joining;
+# - on Leaf-Branches;
 # Note: Branch with 2 leaves = 0;
 # nc = Count of leaves on a branch;
 #' @export
@@ -100,8 +106,36 @@ count.jLeaves0 = function(x) {
 	return(nL);
 }
 
+### Size of Leaf-Branches
+# x = Tree;
+# counts = Number of leafs on each branch;
+#' @export
+size.leafBranch = function(x, counts = NULL) {
+	if(is.null(counts)) counts = count.nodes(x);
+	x = x$merge;
+	LEN = nrow(x);
+	if(length(counts) != LEN) {
+		stop("Number of nodes differs!");
+	}
+	if(LEN == 0) return(numeric(0));
+	#
+	idLeaf = which(x[, 1] < 0);
+	res    = rep(1, length(idLeaf));
+	# Real Branches:
+	idPos  = which(x[idLeaf, 2] > 0);
+	if(length(idPos) > 0) {
+		idBranch   = idLeaf[idPos];
+		res[idPos] = counts[x[idBranch, 2]];
+	}
+	# 2nd Col:
+	idLeaf   = which(x[, 2] < 0);
+	idBranch = idLeaf[x[idLeaf, 1] > 0];
+	res = c(res, counts[x[idBranch, 1]]);
+	return(res);
+}
 
-### Extract Subtree
+#############
+### Sub-Trees
 
 ### Extract Subtree
 # x = Leaf included in the subtree;
@@ -350,6 +384,7 @@ order.tree = function(x) {
 	return(nOrder);
 }
 
+### Aggregate Functions
 
 ### Collect all Leaves on a Branch
 # x = Matrix of Nodes;
@@ -459,36 +494,8 @@ summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 }
 
 
-### Size of Leaf-Branches
-# Leaf-Branch = Branch to which a leaf joins;
-#
-# x = Tree;
-# counts = Number of leafs on each branch;
-#' @export
-size.leafBranch = function(x, counts = NULL) {
-	if(is.null(counts)) counts = count.nodes(x);
-	x = x$merge;
-	LEN = nrow(x);
-	if(length(counts) != LEN) {
-		stop("Number of nodes differs!");
-	}
-	if(LEN == 0) return(numeric(0));
-	#
-	idLeaf = which(x[, 1] < 0);
-	res    = rep(1, length(idLeaf));
-	# Real Branches:
-	idPos  = which(x[idLeaf, 2] > 0);
-	if(length(idPos) > 0) {
-		idBranch   = idLeaf[idPos];
-		res[idPos] = counts[x[idBranch, 2]];
-	}
-	# 2nd Col:
-	idLeaf   = which(x[, 2] < 0);
-	idBranch = idLeaf[x[idLeaf, 1] > 0];
-	res = c(res, counts[x[idBranch, 1]]);
-	return(res);
-}
-
+#########
+### Tools
 
 ### Remove Inversions
 # - Adjust height in order to remove inversions;
