@@ -134,6 +134,30 @@ size.leafBranch = function(x, counts = NULL) {
 	return(res);
 }
 
+### Count Leaves
+# - Useful to compute various tree-Indexes
+#   using simpler 1 pass algorithms;
+# - Computations possible without the merge-data-structure;
+# Out = Matrix with 2 rows;
+#' @export
+count.leavesD = function(x) {
+	x   = x$merge;
+	LEN = nrow(x);
+	if(LEN < 1) return(matrix(0, nrow=2, ncol=0));
+	mR = matrix(0, nrow = 2, ncol = LEN);
+	for(id in seq(LEN)) {
+		ni = x[id,1];
+		nc = if(ni < 0) 1 else sum(mR[, ni]);
+		mR[1, id] = nc;
+		ni = x[id,2];
+		nc = if(ni < 0) 1 else sum(mR[, ni]);
+		mR[2, id] = nc;
+	}
+	# TODO: sort values?
+	class(mR) = c("DualCount", class(mR));
+	return(mR);
+}
+
 #############
 ### Sub-Trees
 
