@@ -498,7 +498,6 @@ summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 ### Average Height of "Leafs"
 # x = Object of type hclust;
 # Out = Simple average of heights of nodes joined by a leaf;
-#     aka Agglomerative coefficient;
 index.agg1 = function(x, h0 = 0) {
 	h  = x$height;
 	hL = h[x$merge[,1] < 0];
@@ -510,7 +509,8 @@ index.agg1 = function(x, h0 = 0) {
 	hT = hT / (length(hL) * maxH);
 	return(hT);
 }
-# Sum of All Heights
+### Sum of All Heights
+# - this is probably the Agglomerative coefficient;
 index.aggAll = function(x, h0 = 0) {
 	h  = x$height;
 	hT = sum(h);
@@ -566,6 +566,45 @@ index.chaining = function(x) {
 	dCh = (2*dCh) / (LEN - 1) / (LEN - 2);
 	return(dCh);
 }
+
+### Entropy
+# Note:
+# - Ward & Complete linkage seem to do a fair job
+#   at generating relatively balanced trees;
+#   (informational entropy ~ 30%)
+#' @export
+index.entropy = function(x) {
+	x = x$merge;
+	LEN = nrow(x);
+	if(LEN < 1) return(0);
+	if(LEN == 1) return(1);
+	log2 = log(2);
+	# nc = Leaf count;
+	nc  = rep(0, LEN);
+	ent = 0;
+	for(id in seq(LEN)) {
+		ni = x[id, 1];
+		if(ni < 0) {
+			n1 = 1; e1 = log2;
+		} else {
+			n1 = nc[ni]; e1 = log(n1);
+		}
+		ni = x[id, 2];
+		if(ni < 0) {
+			n2 = 1; e2 = log2;
+		} else {
+			n2 = nc[ni]; e2 = log(n2);
+		}
+		nci = n1 + n2;
+		ent = ent - (n1*e1 + n2*e2) / nci + log(nci);
+		nc[id] = nci;
+	}
+	# Normalisation:
+	ent = ent / LEN;
+	return(ent);
+}
+
+###############
 
 #########
 ### Tools
