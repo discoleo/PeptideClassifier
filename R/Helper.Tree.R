@@ -495,8 +495,9 @@ summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 
 ### Agglomerative Index
 
+### Simple Sum of Heights
 # x = Object of type hclust;
-index.agglomerative = function(x, h0 = 0) {
+index.agg1 = function(x, h0 = 0) {
 	h  = x$height;
 	hL = h[x$merge[,1] < 0];
 	hL = c(hL, h[x$merge[,2] < 0]);
@@ -507,6 +508,16 @@ index.agglomerative = function(x, h0 = 0) {
 	hT = hT / (length(hL) * maxH);
 	return(hT);
 }
+index.agglomerative = function(x, h0 = 0) {
+	h  = x$height;
+	hT = sum(h);
+	if(h0 != 0) hT = hT - h0 * length(h);
+	# Height of Root:
+	maxH = h[length(h)] - h0;
+	hT = hT / (length(h) * maxH);
+	return(hT);
+}
+
 
 
 #########
