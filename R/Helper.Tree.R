@@ -498,6 +498,7 @@ summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 ### Average Height of "Leafs"
 # x = Object of type hclust;
 # Out = Simple average of heights of nodes joined by a leaf;
+#     aka Agglomerative coefficient;
 index.agg1 = function(x, h0 = 0) {
 	h  = x$height;
 	hL = h[x$merge[,1] < 0];
@@ -509,7 +510,8 @@ index.agg1 = function(x, h0 = 0) {
 	hT = hT / (length(hL) * maxH);
 	return(hT);
 }
-index.agglomerative = function(x, h0 = 0) {
+# Sum of All Heights
+index.aggAll = function(x, h0 = 0) {
 	h  = x$height;
 	hT = sum(h);
 	if(h0 != 0) hT = hT - h0 * length(h);
@@ -541,6 +543,29 @@ index.aggWSum = function(x, h0 = 0) {
 	return(hT);
 }
 
+### Chaining Coefficient
+# Note: similar in concept to the Branch Ratio;
+#' @export
+index.chaining = function(x) {
+	x = x$merge;
+	LEN = nrow(x);
+	if(LEN < 3) return(0);
+	# nc = Leaf count;
+	nc  = rep(0, LEN);
+	dCh = 0;
+	for(id in seq(LEN)) {
+		ni = x[id, 1];
+		n1 = if(ni < 0) 1 else nc[ni];
+		ni = x[id, 2];
+		n2 = if(ni < 0) 1 else nc[ni];
+		dn = abs(n1 - n2);
+		dCh    = dCh + dn;
+		nc[id] = n1 + n2;
+	}
+	# Normalisation:
+	dCh = (2*dCh) / (LEN - 1) / (LEN - 2);
+	return(dCh);
+}
 
 #########
 ### Tools
