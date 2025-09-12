@@ -595,7 +595,7 @@ index.chaining = function(x) {
 # Note:
 # - Ward & Complete linkage seem to do a fair job
 #   at generating relatively balanced trees;
-#   (informational entropy ~ 30%)
+#   (informational entropy = 40% - 50%)
 #' @export
 index.entropy = function(x) {
 	x = x$merge;
@@ -625,6 +625,7 @@ index.entropy = function(x) {
 	}
 	# Normalisation:
 	ent = ent / LEN;
+	ent = ent / log2; # Log-Base = 2;
 	return(ent);
 }
 
