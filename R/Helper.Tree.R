@@ -495,8 +495,9 @@ summary.branchRatiosTn = function(x, name.Br0 = "NBr0") {
 
 ### Agglomerative Index
 
-### Simple Sum of Heights
+### Average Height of "Leafs"
 # x = Object of type hclust;
+# Out = Simple average of heights of nodes joined by a leaf;
 index.agg1 = function(x, h0 = 0) {
 	h  = x$height;
 	hL = h[x$merge[,1] < 0];
@@ -514,10 +515,31 @@ index.agglomerative = function(x, h0 = 0) {
 	if(h0 != 0) hT = hT - h0 * length(h);
 	# Height of Root:
 	maxH = h[length(h)] - h0;
-	hT = hT / (length(h) * maxH);
+	hT   = hT / (length(h) * maxH);
 	return(hT);
 }
-
+### Harmonic-Weighted Sum of Heights
+index.aggHarm = function(x, h0 = 0) {
+	h  = x$height;
+	nc = count.nodes(x);
+	hT = sum((h - h0) / nc);
+	hT = hT / sum(1/nc);
+	# Height of Root:
+	maxH = h[length(h)] - h0;
+	hT   = hT / maxH;
+	return(hT);
+}
+### Simple Weighted Sum of Heights
+index.aggWSum = function(x, h0 = 0) {
+	h  = x$height;
+	nc = count.nodes(x); # Counts only leaves;
+	hT = sum((h - h0) * nc);
+	hT = hT / sum(nc);
+	# Height of Root:
+	maxH = h[length(h)] - h0;
+	hT   = hT / maxH;
+	return(hT);
+}
 
 
 #########
