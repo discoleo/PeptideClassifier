@@ -123,3 +123,22 @@ trim = function(x) {
 	sub("^[ \t\n\r]+", "",
 		sub("[ \t\n\r]+$", "", x));
 }
+
+# Add / Replace Element:
+replace.last = function(x, lst, max = 5) {
+	len = length(lst);
+	if(len == 0) return(list(x));
+	last = lst[[len]];
+	if(class(last) == class(x) && last == x) return(lst);
+	if(len == 1) return(c(lst, x));
+	# Check each Element:
+	for(id in seq(len-1)) {
+		el = lst[[id]]
+		if(class(el) == class(x) && el == x) {
+			lst = lst[- id];
+			len = len - 1; break;
+		}
+	}
+	if(len == max) lst = lst[- 1];
+	return(c(lst, x));
+}

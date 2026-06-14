@@ -25,6 +25,8 @@ panelClustering = function(img.height = 800) {
 		### Generate Tree
 		# Existing Tree:
 		fileInput.rds("loadTree", "Load existing Tree"),
+		div(textOutput("txtTreeWarnExt"),
+			style = "color:red; font-weight: bold; padding-bottom: 12px;"),
 		# New Tree:
 		fluidRow(
 		column(8,
@@ -46,7 +48,7 @@ panelClustering = function(img.height = 800) {
 		column(8, textInput("txtSubTree_Node", "Node/Peptide", "")),
 		column(4, textInput("txtSubTree_Size", "Size", "50")),
 		),
-		actionButton("btnSubtree", "SubTree"),
+		actionButton("btnSubTree", "SubTree"),
 		actionButton("btnSubT_Details", "Peptides"),
 		# SubTree Data:
 		downloadButton("downloadSubT_Data", "Data"),
@@ -54,6 +56,8 @@ panelClustering = function(img.height = 800) {
 		# Messages
 		h3(textOutput("txtTreeWarn")),
 		textOutput("txtTreeInfo"),
+		# History:
+		actionButton("btnSubTreeHistory", "History"),
 	),
 	mainPanel(
 		plotOutput("imgTree", height = hImg),

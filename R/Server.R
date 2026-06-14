@@ -30,8 +30,14 @@ server.app = function(input, output, session) {
 		### Trees:
 		# Solitary Leaf vs L2-Leaf;
 		colTreeLeaves = c(L1 = "#FF886490", L2 = "#6432FFB8"),
-		adjTreeHeight = TRUE, # Remove Inversions
+		adjTreeHeight = TRUE,  # Remove Inversions
+		sizeHist_SubTree = 5,  # Size of Search-History
 		# TODO
+		NULL
+	);
+	strMessages = list(
+		txtTreeWarnExt   = "Warning: Loaded Tree inconsistent with DTM/Data!",
+		txtTreeWarnNoDTM = "Warning: No DTM for loaded Tree!",
 		NULL
 	);
 	
@@ -99,6 +105,8 @@ server.app = function(input, output, session) {
 		colTreeLeaves  = options$colTreeLeaves,
 		pruneTreeSize  = 0, # Prune Tree: Min Size of Branches;
 		adjTreeHeight  = options$adjTreeHeight, # Remove Inversions
+		histSubTree    = list(), # History with SubTree-searches;
+		isTreeLoaded   = FALSE,  # Is it loaded from external data?
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
 		clustBrRatios  = NULL, # Branch Ratios (all branches)
@@ -645,7 +653,8 @@ server.app = function(input, output, session) {
 		formatRound("ChargesN", 2);
 	})
 	
-	################
+	###########################
+	###########################
 	
 	### Hierarchical Clustering
 	
@@ -684,7 +693,8 @@ server.app = function(input, output, session) {
 		distM  = dist(dtm);
 		# Note: attr(distM, "labels") == NULL!
 		hClust = hclust(distM, method = type);
-		values$clustResult = hClust;
+		values$clustResult  = hClust;
+		values$isTreeLoaded = FALSE;
 		print(str(hClust));
 	})
 	
@@ -726,7 +736,7 @@ server.app = function(input, output, session) {
 	})
 	
 	### Extract SubTree:
-	observeEvent(input$btnSubtree, {
+	observeEvent(input$btnSubTree, {
 		resetST = function() values$clustSubTree = NULL;
 		x = values$clustResult;
 		if(is.null(x)) { resetST(); return(); }
@@ -749,7 +759,11 @@ server.app = function(input, output, session) {
 				# node = which(values$clustResult$labels == node);
 				# node = as.integer(node);
 				cat("Node: ", node, "\n");
+				# History:
+				replaceHistSubTree(strN);
 			}
+		} else if(node > 0) {
+			replaceHistSubTree(node);
 		}
 		if(node == 0) {
 			resetST(); return();
@@ -768,6 +782,10 @@ server.app = function(input, output, session) {
 		attr(subT, "N0") = node;
 		values$clustSubTree = subT;
 	})
+	replaceHistSubTree = function(x) {
+		values$histSubTree = replace.last(x, values$histSubTree,
+			max = options$sizeHist_SubTree);
+	}
 	
 	# Plot SubTree:
 	output$imgSubTree = renderPlot({
@@ -778,6 +796,7 @@ server.app = function(input, output, session) {
 		print(pos);
 	});
 	
+	# Read Labels from Tree:
 	readFromTree = function(add.id = FALSE) {
 		x = values$clustSubTree;
 		if(is.null(x)) return(NULL);
@@ -829,13 +848,37 @@ server.app = function(input, output, session) {
 			saveRDS(x, file = file);
 		}
 	)
+	# History
+	observeEvent(input$btnSubTreeHistory, {
+		# TODO
+		for(el in values$histSubTree) {
+			cat(el, "\n");
+		}
+	})
+	
+	# Load External Tree
 	observeEvent(input$loadTree, {
 		ff = input$loadTree;
 		if(is.null(ff)) 
 			return(NULL);
 		#
 		x = readRDS(ff$datapath);
-		values$clustResult = x;
+		values$clustResult  = x;
+		values$isTreeLoaded = TRUE;
+	})
+	output$txtTreeWarnExt = renderText({
+		if(! values$isTreeLoaded) return("");
+		x = values$clustResult;
+		if(is.null(x)) return("");
+		# Check: Tree consistent with Data
+		msg = "";
+		sz  = length(x$order);
+		if(is.null(values$dfDTMData)) {
+			msg = strMessages$txtTreeWarnNoDTM;
+		} else if(sz != nrow(values$dfDTMData)) {
+			msg = strMessages$txtTreeWarnExt;
+		}
+		return(msg);
 	})
 	
 	# Messages:
