@@ -17,6 +17,7 @@ server.app = function(input, output, session) {
 	# Global Options
 	options = list(
 		fltGlobalLen    = c(6, 60), # Default value for Global Length;
+		fltDTMLen       = c(6, 40), # Default value for Length in DTM page;
 		sep = ",",         # csv Separator
 		sepCsvCor = ",",   # csv Separator: Cor-Matrix;
 		# Regex & Other Options:
@@ -61,6 +62,8 @@ server.app = function(input, output, session) {
 	### Init:
 	updateNumericInput(session, "fltGlobalLen",
 		value = options$fltGlobalLen);
+	updateNumericInput(session, "fltDTMLen",
+		value = options$fltDTMLen);
 	updateTextInput(session, "inTMSeed",
 		value = asChar(options$seedTM));
 	updateTextInput(session, "inTreeColLeaf",
