@@ -25,7 +25,8 @@ server.app = function(input, output, session) {
 		reg.PP    = TRUE,  # Regex for Epitopes-Table
 		highlight = TRUE,  # Highlight Search Term
 		# PP: Analysis
-		Breaks_PP_Length = c(0, 9, 19, 29, 39, 100),
+		# Breaks used in the Summary Statistics:
+		PP_Length_Breaks = c(0, 9, 19, 29, 39, 100),
 		# Topic Models:
 		seedTM    = NULL,  # Seed: 123
 		### Trees:
@@ -92,7 +93,7 @@ server.app = function(input, output, session) {
 		idDocRm   = NULL,   # Docs removed following TF-IDF
 		isDocRm   = FALSE,  # Are there any Docs Removed?
 		# Categories:
-		brkLen    = options$Breaks_PP_Length, # PP-Length
+		brkLen    = options$PP_Length_Breaks, # PP-Length
 		# Topic Models
 		nClusters   = 0,
 		seedTM      = NULL,  # Seed for TMs;
