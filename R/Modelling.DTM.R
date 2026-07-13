@@ -67,6 +67,22 @@ summary.dtm = function(x, dtmFlt, tf.idf) {
 	return(tbl);
 }
 
+### Terms appearing in x Documents
+# x   = Number of Documents per Term;
+# ids = ids of Terms to keep;
+which.docs.dtm = function(x, dtm, ids = 1) {
+	nD  = col_sums(dtm);
+	idT = which(nD == x);
+	nT  = length(idT);
+	# Limit Terms only to the "ids";
+	if(! is.null(ids) && nT > 0) idT = idT[ids];
+	sT  = dtm$dimnames[[2L]][idT];
+	idD = unique(dtm$i[dtm$j %in% idT]);
+	idD = dtm$dimnames[[1L]][idD];
+	res = list(Terms = sT, idDocs = idD, nT = nT);
+	return(res);
+}
+
 #' @export
 freq.term = function(x, data) {
 	id = match(x, data$dimnames$Terms);

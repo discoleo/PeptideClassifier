@@ -16,6 +16,7 @@ panelDTM = function() {
 			actionButton("btnDTM", "Build DTM"),
 			actionButton("btnDTMFilter", "Filter DTM"),
 			actionButton("btnDTMInspectPP", "Inspect"),
+			actionButton("btnDTMDocByN", "Doc: n-T"),
 			# n-Grams:
 			fluidRow(HTML("&nbsp;")),
 			checkboxNGrams(),

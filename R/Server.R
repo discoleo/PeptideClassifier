@@ -322,6 +322,8 @@ server.app = function(input, output, session) {
 		values$fltDTMSeq = input$fltDTMSeq;
 		filterSeq();
 	})
+	
+	### Inspect Encoded Features
 	observeEvent(input$btnDTMInspectPP, {
 		dtm = values$dtmFlt;
 		if(is.null(dtm)) {
@@ -383,6 +385,18 @@ server.app = function(input, output, session) {
 		# Excluded Terms:
 		# trmEx = setdiff(values$termsAll, dtmFlt$dimnames[[2L]]);
 		# cat("Excluded terms: "); print(trmEx);
+	})
+	
+	# Display Docs with n-Terms
+	observeEvent(input$btnDTMDocByN, {
+		dtm = values$dtmData;
+		if(is.null(dtm)) return();
+		# TODO: Reused!
+		n   = as.integer(input$fltDTMDocID);
+		idD = which.docs.dtm(n, dtm = dtm);
+		cat("Number of Docs: ", length(idD$idDocs), "\n");
+		cat("Use the $idDocs with Inspect\n");
+		print(idD);
 	})
 	
 	# Original DTM:

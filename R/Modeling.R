@@ -409,8 +409,11 @@ as.charges = function(x) {
 }
 
 ### Convert to Seq of H-Donors:
-# AA = K/R, S, T, N/Q & N-Terminal;
-# TODO: decide on C, H, Y;
+# AA = K/R, S, T, N/Q, Y & N-Terminal;
+# TODO:
+# - decide on H: is protonated at neutral pH;
+# - C is probably not relevant;
+# - pyro-glutamic acid is NOT considered;
 # Note: D, E are only acceptors;
 as.hdonor = function(x) {
 	len = length(x);
@@ -424,11 +427,11 @@ as.hdonor = function(x) {
 		for(npos in seq(szSeq)) {
 			ch = substr(seqAA, npos, npos);
 			if(ch == 'K' || ch == 'N' || ch == 'Q' ||
-				ch == 'R' || ch == 'S' || ch == 'T') {
+				ch == 'R' || ch == 'S' || ch == 'T' || ch == 'Y') {
 				seqCh[npos] = +1;
 			}
 		}
-		# Up to 2 H can be donated;
+		# N-Terminal: Up to 2 H can be donated;
 		seqCh[1] = seqCh[1] + 1;
 		return(seqCh);
 	});
