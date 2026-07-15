@@ -70,9 +70,23 @@ The construction of the dataset is described in:
 
 #### Terminology
 
-A micro-cluster is a cluster formed by exactly 2 leaves. A mini-cluster includes more than 2 leaves, but far less than O(n), where n is the number of leaves in the tree. A good threshold is log(n): in a tree formed from 1 000 leaves, mini-clusters have between 3 and 10 leaves.
+A micro-cluster is a cluster formed by exactly 2 leaves. A mini-cluster includes more than 2 leaves, but far less than O(n), where n is the number of leaves in the tree. A good threshold is log(n): in a tree formed from 1 000 leaves, mini-clusters range between 3 and 10 leaves.
 
 Macro-clusters can be defined as clusters having at least O(n^p) leaves, where p is a fractional parameter. Possible thresholds for the number of leaves are sqrt(n) or n^(1/3); scaling these values by a constant may be useful as well.
 
 Every cluster with the number of leaves between O(log(n)) and O(n^p) can be described as a medium sized cluster. A balanced tree will have sufficiently medium sized clusters, which join to form non-nested macro-clusters. In some types of trees, a single macro-cluster increases steadily in size: such clusters are not useful for the current project.
 
+#### Basic Criteria
+Clusters can be formed by merging 2 leaves, or 1 leaf and a bigger cluster or 2 bigger clusters. One of the simplest criteria is the number of clusters formed by only 2 leaves (micro-clusters). This value can be normalized by the number of leaves (or clusters) in the tree.
+
+A perfectly balanced tree at the bottom level will have all leaves join another leaf to form only 2-leaf clusters (micro-clusters). There are no leaves joining larger clusters.
+
+At the opposite end, most leaves join bigger clusters: either one steadily growing cluster, or multiple bigger clusters.
+
+#### Branching Criteria
+Similarly, one can extend the previous criterion to better cover the remaining tree. The criteria can compute summaries related to the size of the clusters, or focus on metrics describing the branching pattern. The next sections will focus on the branching patterns.
+
+**Branch Ratio**\
+A simple branch ratio can be computed as the ratio of leaves on the larger branch to those on the smaller branch. This ratio is close to 1 for most branches in a well balanced tree.
+
+The criterion can be applied to all branches, or only to branches where an actual leaf joins the cluster. Various summary statistics can be computed on these values. Furthermore, one can exclude the clusters with only 2 leaves, the micro-clusters, from these statistics.
