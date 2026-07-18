@@ -27,7 +27,7 @@ math.Beta = function(input, tol, options = NULL) {
 	### Generalised Beta: Exact formula;
 	# see formulas on GitHub:
 	# https://github.com/discoleo/R/blob/master/Math/Integrals.Double.Radicals.R
-	div = (py+1)*nx-(px+1)*ny;
+	div = (py+1)*nx - (px+1)*ny;
 	if(abs(div) <= 1E-12) {
 		# TODO: Derivative;
 		print("Int: Not yet implemented!");

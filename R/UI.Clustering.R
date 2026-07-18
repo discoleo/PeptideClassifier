@@ -176,7 +176,7 @@ selectDxCorTypes = function(selected = "circle", id = "fltDxCorTypes") {
 
 # Correlation Plot: Order
 selectDxCorOrder = function(selected = "AOE", id = "fltDxCorOrder") {
-	selectInput(id, label = "Visualisation Type:",
+	selectInput(id, label = "Ordering Type:",
 		choices = list(
 			"AOE" = "AOE", "FPC" = "FPC",
 			"Clustering" = "hclust", "Original" = "original"),
