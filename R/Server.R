@@ -509,6 +509,8 @@ server.app = function(input, output, session) {
 		values$tmResult = res.tm;
 	})
 	
+	### Downloads
+	
 	output$downloadTMSummary = downloadHandler(
 		filename = function() {
 			n = values$nClusters;
@@ -522,6 +524,7 @@ server.app = function(input, output, session) {
 		}
 	)
 	
+	# Download Top Topics for each Doc:
 	output$downloadTMTopics = downloadHandler(
 		filename = function() {
 			n = values$nClusters;
@@ -536,6 +539,22 @@ server.app = function(input, output, session) {
 			if(n == 0) n = values$nClusters;
 			xdf = docTopic(x, n = n);
 			write.csv(xdf, file, row.names = FALSE);
+		}
+	)
+	
+	# Download Top Terms for each Topic:
+	output$downloadTMTerms = downloadHandler(
+		filename = function() {
+			n = values$nClusters;
+			type = input$fltTMType;
+			paste("TMTerms.", type, "_", n, ".csv", sep = "");
+		},
+		content = function(file) {
+			xtm = values$tmResult;
+			if(is.null(xtm)) return();
+			x = getTerms(xtm);
+			if(is.null(x)) return(NULL);
+			write.csv(x, file, row.names = FALSE);
 		}
 	)
 	
@@ -572,6 +591,7 @@ server.app = function(input, output, session) {
 		values$tmResult = x$TM;
 	})
 	
+	# Set Number of Top Topics:
 	observeEvent(input$inTMDownloadTop, {
 		x = input$inTMDownloadTop;
 		if(is.null(x) || nchar(x) == 0) {
@@ -623,6 +643,14 @@ server.app = function(input, output, session) {
 	})
 	
 	### Topic Terms
+	getTerms = function(xtm) {
+		nClusters = xtm[[1]]@k;
+		idModel   = getModel(length(xtm));
+		top    = input$numTermsTM;
+		termsT = terms(xtm[[idModel]], top);
+		termsT = termsT[, seq(nClusters)];
+		return(termsT);
+	}
 	output$tblTopicTerms = DT::renderDT({
 		xtm = values$tmResult;
 		if(is.null(xtm)) return();
@@ -630,10 +658,7 @@ server.app = function(input, output, session) {
 		nClusters = values$nClusters;
 		if(xtm[[1]]@k != nClusters) return();
 		#
-		idModel = getModel(length(xtm));
-		top = input$numTermsTM;
-		termsT = terms(xtm[[idModel]], top);
-		termsT = termsT[, seq(nClusters)];
+		termsT = getTerms(xtm);
 		DT::datatable(termsT, options = list(dom = 'tp'));
 	})
 	

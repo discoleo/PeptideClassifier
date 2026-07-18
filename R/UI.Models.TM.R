@@ -24,6 +24,7 @@ panelTopicModel = function() {
 				value = 10, min = 5, max = 45, step = 5),
 			# Existing Models:
 			fileInput.rds("loadTMFull", "Load existing Models"),
+			downloadButton("downloadTMTerms", "Terms"),   # Export Top Terms
 			# LDA-Control:
 			fluidRow(tag("h3", "Model Control:")),
 			fluidRow(
