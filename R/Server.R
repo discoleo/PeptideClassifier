@@ -271,6 +271,8 @@ server.app = function(input, output, session) {
 		selectPage(proxy, pg);
 	}
 	
+	##################
+	
 	### Modelling: DTM
 	
 	filterSeq = reactive({
@@ -397,6 +399,17 @@ server.app = function(input, output, session) {
 		cat("Number of Docs: ", length(idD$idDocs), "\n");
 		cat("Use the $idDocs with Inspect\n");
 		print(idD);
+	})
+	
+	# Select ALL Chemical Features (4-6)
+	observeEvent(input$btnDTMChem46, {
+		sSel = input$chkNGrams;
+		print(sSel)
+		s0 = c("ch4.tot", "ch4.aa", "ch4.hd",
+			"ch5.tot", "ch5.aa", "ch5.hd",
+			"ch6.tot", "ch6.aa", "ch6.hd");
+		sSel = unique(c(sSel, s0));
+		updateCheckboxGroupInput(session, "chkNGrams", selected = sSel);
 	})
 	
 	# Original DTM:
@@ -711,7 +724,7 @@ server.app = function(input, output, session) {
 		# Feature
 		nmFeature = input$fltTMFeature;
 		xdf = xdf[, nmFeature];
-		output$imgTMBoxPlot = renderPlot(boxplot(xdf ~ idTopic));
+		output$imgTMBoxPlot = renderPlot(boxplot(xdf ~ idTopic, ylab = nmFeature));
 	})
 	
 	

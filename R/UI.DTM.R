@@ -26,9 +26,12 @@ panelDTM = function() {
 				textInput(inputId = "fltDTMDocID", label = "Inspect PP",
 					value = "1", width = 150) ),
 			column(6,
+			actionButton("btnDTMChem46", "Chem 4-6"),
+			) ),
+			fluidRow(
 				# Show Removed Docs:
 				checkboxInput(inputId = "fltDTMDocRem", label = "Show Removed PPs",
-					value = TRUE) )
+					value = TRUE)
 			),
 		),
 		### Main Panel
