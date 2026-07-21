@@ -696,6 +696,25 @@ server.app = function(input, output, session) {
 		formatRound("ChargesN", 2);
 	})
 	
+	# BoxPlot:
+	observeEvent(input$btnTMBoxPlot, {
+		xdf = values$dfDTMData;
+		xtm = values$tmResult;
+		if(is.null(xdf) || is.null(xtm)) return();
+		idDocRm = values$idDocRm;
+		if(! is.null(idDocRm)) xdf = xdf[- idDocRm, ];
+		# Topics:
+		values$idModel = as.integer(input$inModelID);
+		idModel = getModel(length(xtm));
+		xtm     = xtm[[idModel]];
+		idTopic = topics(xtm, 1); # Only Top Topic;
+		# Feature
+		nmFeature = input$fltTMFeature;
+		xdf = xdf[, nmFeature];
+		output$imgTMBoxPlot = renderPlot(boxplot(xdf ~ idTopic));
+	})
+	
+	
 	###########################
 	###########################
 	

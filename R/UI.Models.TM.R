@@ -8,7 +8,7 @@ panelTopicModel = function() {
 			sliderInput(inputId = "numTMClusters",
 				label = "Clusters / Topics",
 				value = 6, min = 2, max = 42, step = 1),
-			selectModel.TM(),
+			selectModel.TM(), # LDA Type
 			actionButton("btnModelTopics", "Run Model"),
 			downloadButton("downloadTMSummary", "Summary"), # Export Summary
 			downloadButton("downloadTMTopics", "Topics"),   # Export Topics
@@ -24,7 +24,13 @@ panelTopicModel = function() {
 				value = 10, min = 5, max = 45, step = 5),
 			# Existing Models:
 			fileInput.rds("loadTMFull", "Load existing Models"),
+			fluidRow(
+			# BoxPlot Features:
+			selectFeature.TM()
+			),
+			# Buttons:
 			downloadButton("downloadTMTerms", "Terms"),   # Export Top Terms
+			actionButton("btnTMBoxPlot", "BoxPlot"),
 			# LDA-Control:
 			fluidRow(tag("h3", "Model Control:")),
 			fluidRow(
@@ -32,7 +38,7 @@ panelTopicModel = function() {
 			column(6, textInput("inTMDownloadTop", "Download Topics", "1", width = 150)),
 			),
 			sliderInput(inputId = "numTM_Iterations", label = "Max Iterations",
-				value = 1000, min = 500, max = 5000, step = 100),
+				value = 1000, min = 500, max = 10000, step = 500),
 		),
 		### Main Panel
 		mainPanel(
@@ -43,6 +49,7 @@ panelTopicModel = function() {
 			# PP in Cluster[i]:
 			fluidRow(DT::DTOutput("tblPPTopic")),
 			fluidRow(DT::DTOutput("tblTopicTerms")),
+			fluidRow(plotOutput("imgTMBoxPlot")),
 		)
 	)
 }
@@ -52,4 +59,14 @@ selectModel.TM = function(selected = "VEM", id = "fltTMType") {
 		label = "Model type:", selected = selected,
 		choices = list("VEM" = "VEM", "fixVEM" = "Fixed VEM",
 					"Gibbs" = "Gibbs", "CTM" = "CTM", "All" = "All") );
+}
+
+# BoxPlot: Feature Selection
+selectFeature.TM = function(selected = "Charge", id = "fltTMFeature") {
+	selectInput(id, label = "BoxPlot Feature:", selected = selected,
+		choices = list(Len  = "Len",
+			"Total Charge"  = "Charge",
+			"Charged AA"    = "ChargedAA",
+			"Charge (Norm)" = "ChargesN")
+	)
 }
