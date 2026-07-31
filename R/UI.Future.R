@@ -10,15 +10,24 @@
 ##
 ## draft v.0.2d
 
+style = function() {
+	"color:#F03232;";
+}
+styleB = function() {
+	"color:#4432D8;weight:heavy;font-size:150%;";
+}
+styleB2 = function() {
+	"color:#6444B2;";
+}
 
-### 
+### Future-Ideas:
 panelTODO = function() {
 	b = function(x) tag("b", x);
 	# UI:
 	fluidRow(
 		h2("Clustering Methods"),
 		"Implement additional robust methods",
-		h3("Robust Single linkage"),
+		h3("Robust Single Linkage"),
 		b("Weighted Single Linkage: "),
 		"use a weighted distance based on the centrality of each point. A point Pi would be weighted by the distance to the center/centroid of its corresponding cluster, e.g. D|Pi – Centroid| + 1, where the factor + 1 ensures that the distance will not vanish for points very close to the centroid. The weighted distance between 2 points is then the product between the actual distance and the 2 weights.",
 		"The weighted distance for points far apart from the corresponding centers is therefore inflated, minimising the impact of such points. The factor +1 could be tuned, e.g. by using the standard error of the mean in the corresponding cluster.",
@@ -26,10 +35,45 @@ panelTODO = function() {
 		b("Combined Single & Complete Linkage: "),
 		"combine the single linkage with the complete linkage and use the sum between the 2 distances.",
 		"The maximum distance will counteract the effect of a single pair of very close points.",
+		NBSP()
+	)
+}
+
+panelTutorial = function() {
+	b = function(x) tag("b", x);
+	# UI:
+	fluidRow(
+		style = "padding-left:20px;",
 		### Analysis:
 		h2("Analysis"),
+		
+		### Cluster Types:
+		h3("Cluster Types"),
+		p(span("Micro-Clusters:", style = styleB()),
+		"A micro-cluster is a cluster formed by exactly 2 leaves."
+		),
+		p(span("Mini-Clusters:", style = styleB()),
+		"A mini-cluster includes more than 2 leaves, but far less than O(n), where n is the number of leaves in the tree.",
+		"A good threshold is log(n): in a tree formed from 1 000 leaves, mini-clusters range between 3 and 10 leaves."
+		),
+		p(span("Macro-Clusters:", style = styleB()),
+		"Macro-clusters can be defined as clusters having at least O(n^p) leaves, where p is a fractional parameter.",
+		"Possible thresholds for the number of leaves are sqrt(n) or n^(1/3); scaling these values by a constant may be useful as well."
+		),
+		p(span("Medium-Sized Clusters:", style = styleB()),
+		"Every cluster with the number of leaves between O(log(n)) and O(n^p) can be described as a medium sized cluster."
+		),
+		
+		# Trees:
+		h4("Balanced Trees", style = styleB2()),
+		"A balanced tree will have sufficiently many medium sized clusters, which join to form non-nested macro-clusters.",
+		h4("Unbalanced Trees", style = styleB2()),
+		"In some types of trees, a single macro-cluster increases steadily in size: such clusters are not useful for the current project.",
+		
+		### Linkage:
+		h3("Linkage Type:"),
 		# McQuitty:
-		h3("McQuitty Method:"),
+		h3("McQuitty Method:", style = style()),
 		"Around half of the leaves join other leaves to form a micro-cluster.",
 		"The remaining leaves are solitary leaves which join a micro- or mini-cluster.",
 		"Only very few solitary leaves join a macro-cluster.",
@@ -38,12 +82,12 @@ panelTODO = function() {
 		### Shortcomings:
 		h2("Shortcomings"),
 		# Median Linkage:
-		h3("Median Linkage:"),
+		h3("Median Linkage:", style = style()),
 		"There are very few micro-clusters (2 leaves), a few mini-clusters and virtually no macro-clusters.",
 		"Almost all leaves join the tree as solitary leaves.",
 		"The solitary leaves join sequentially to a single very large \"branch\".",
 		# Average Linkage:
-		h3("Average Linkage:"),
+		h3("Average Linkage:", style = style()),
 		"There are very few macro-clusters.",
 		"Many micro- and mini-clusters join one of the large branches, which grows sequentially to a larger size.",
 		"Most leaves form actually micro-clusters, which merge then to mini-clusters.",
