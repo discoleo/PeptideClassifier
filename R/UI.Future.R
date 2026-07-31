@@ -42,7 +42,7 @@ panelTODO = function() {
 panelTutorial = function() {
 	b = function(x) tag("b", x);
 	# UI:
-	fluidRow(
+	rowUI = fluidRow(
 		style = "padding-left:20px;",
 		### Analysis:
 		h2("Analysis"),
@@ -69,8 +69,18 @@ panelTutorial = function() {
 		"A balanced tree will have sufficiently many medium sized clusters, which join to form non-nested macro-clusters.",
 		h4("Unbalanced Trees", style = styleB2()),
 		"In some types of trees, a single macro-cluster increases steadily in size: such clusters are not useful for the current project.",
-		
-		### Linkage:
+	);
+	c(rowUI,
+		panelTutorial_Linkage(),
+		panelTutorial_Shortcomings());
+}
+
+panelTutorial_Linkage = function() {
+	b = function(x) tag("b", x);
+	# UI:
+	fluidRow(
+		style = "padding-left:20px;",
+		### Linkage Types:
 		h3("Linkage Type:"),
 		# McQuitty:
 		h3("McQuitty Method:", style = style()),
@@ -79,6 +89,14 @@ panelTutorial = function() {
 		"Only very few solitary leaves join a macro-cluster.",
 		"The micro-clusters merge together to form larger mini-clusters and then macro-clusters.",
 		"There is a good partitioning into medium-sized and large-sized clusters.",
+	)
+}
+
+panelTutorial_Shortcomings = function() {
+	b = function(x) tag("b", x);
+	### Shortcomings:
+	fluidRow(
+		style = "padding-left:20px;",
 		### Shortcomings:
 		h2("Shortcomings"),
 		# Median Linkage:
@@ -86,6 +104,15 @@ panelTutorial = function() {
 		"There are very few micro-clusters (2 leaves), a few mini-clusters and virtually no macro-clusters.",
 		"Almost all leaves join the tree as solitary leaves.",
 		"The solitary leaves join sequentially to a single very large \"branch\".",
+		
+		# Centroid Linkage:
+		h3("Centroid Linkage:", style = style()),
+		"There are very few macro-clusters, and, with the exception of the main branch, all are tiny.",
+		"Most of them are actually at the limit between medium-sized and macro-clusters.",
+		"Most leaves join one single branch as solitary leaves.",
+		"This branch grows steadily.",
+		"Another issue is the presence of (large numbers of) inversions.",
+		
 		# Average Linkage:
 		h3("Average Linkage:", style = style()),
 		"There are very few macro-clusters.",
@@ -96,6 +123,6 @@ panelTutorial = function() {
 		when pruning a tree: a pruning size of over 100 is needed to get a sparser tree.",
 		"It may be less suited to classify biologically active peptides and infer similar receptor affinities.",
 		NBSP()
-	)
+	);
 }
 
