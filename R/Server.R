@@ -1189,4 +1189,13 @@ server.app = function(input, output, session) {
 		output$txtBetaResult  = renderText(res$Exact);
 		output$txtBetaNumeric = renderText(res$Numerical);
 	})
+	
+	### Tutorial
+	
+	output$imgTutor_Inversions = renderPlot({
+		par.old = par(mfrow = c(1,2));
+		plot.data.centroid();
+		plot.tree.centroid();
+		par(par.old);
+	})
 }

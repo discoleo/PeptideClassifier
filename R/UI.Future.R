@@ -122,6 +122,11 @@ panelTutorial_Shortcomings = function() {
 		"It merges very rarely 2 larger clusters! This is easily seen on sub-trees and
 		when pruning a tree: a pruning size of over 100 is needed to get a sparser tree.",
 		"It may be less suited to classify biologically active peptides and infer similar receptor affinities.",
+		
+		# Inversions:
+		h3("Inversions:", style = style()),
+		"Inversions are common with certain linkage types, e.g. with centroid linkage.",
+		fluidRow(plotOutput("imgTutor_Inversions")),
 		NBSP()
 	);
 }

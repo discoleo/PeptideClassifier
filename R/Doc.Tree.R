@@ -20,8 +20,9 @@ link.centroid.data = function() {
 
 ### Centroids
 #' @export
-plot.data.centroid = function(col = "red", pch = 16,
-		labels.stem = "C", dxy = 0.5, dC = 0.25) {
+plot.data.centroid = function(col = c("red", "blue"), pch = 16,
+		labels.stem = "C", labels.points = "P",
+		dxy = 0.5, dC = 0.25) {
 	df = link.centroid.data();
 	cc = data.frame(
 		x  = c(0.3,0.3,0.3,  3, 8/3, 9.2/7),
@@ -32,10 +33,14 @@ plot.data.centroid = function(col = "red", pch = 16,
 	limx = range(df$x) + dxy;
 	limy = range(df$y) + dxy;
 	plot(df, xlim = limx, ylim = limy);
-	points(cc, col=col, pch=pch);
+	points(cc, col=col[[1]], pch=pch);
+	if(! is.null(labels.points)) {
+		lbls = paste(labels.points, seq(nrow(df)), sep = "");
+		text(df$x, df$y + dC, labels = lbls, col = col[[2]]);
+	}
 	if(! is.null(labels.stem)) {
 		lbls = paste(labels.stem, cc$id, sep = "");
-		text(cc$x, cc$y + dC, labels = lbls, col = col);
+		text(cc$x, cc$y + dC, labels = lbls, col = col[[1]]);
 	}
 	invisible();
 }
