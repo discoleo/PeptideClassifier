@@ -46,10 +46,17 @@ plot.data.centroid = function(col = c("red", "blue"), pch = 16,
 }
 
 # Inversions:
-plot.tree.centroid = function() {
+#' @export
+plot.tree.centroid = function(col = "red", cex = 1.2) {
 	d = link.centroid.data();
 	tree = hclust(dist(d), method = "centroid");
-	tree$call[[2]] = "D = Set w. Inversions";
-	plot(tree, main = "Dendrogram with Inversions");
+	tree$call = NULL;
+	xlab = "Linkage: Centroid";
+	main = "Dendrogram with Inversions";
+	# Plot Area:
+	par.old = par(mar = c(2, 4.5, 4, 2) + 0.1);
+	on.exit(par(par.old));
+	plot(tree, main=main, xlab = NULL, cex = cex);
+	mtext(xlab, side = 1, cex=cex, col=col);
 	invisible(tree);
 }
