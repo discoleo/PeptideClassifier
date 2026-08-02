@@ -42,21 +42,29 @@ panelClustering = function(img.height = 800) {
 		),
 		# Value is set in Server:
 		textInput("inTreeColLeaf", "Colour: Solitary Leaves", ""),
-		# SubTrees:
+		# Messages
+		h3(textOutput("txtTreeWarn")),
+		textOutput("txtTreeInfo"),
+		
+		### SubTrees:
 		h3("Subtree:"),
 		fluidRow(
 		column(8, textInput("txtSubTree_Node", "Node/Peptide", "")),
 		column(4, textInput("txtSubTree_Size", "Size", "50")),
 		),
+		# Sub-Tree Buttons:
 		actionButton("btnSubTree", "SubTree"),
 		actionButton("btnSubT_Details", "Peptides"),
 		# SubTree Data:
 		downloadButton("downloadSubT_Data", "Data"),
 		downloadButton("downloadTree", "Full Tree"),
-		# Messages
-		h3(textOutput("txtTreeWarn")),
-		textOutput("txtTreeInfo"),
-		# History:
+		# History & Other Settings:
+		fluidRow(
+		column(6,
+		numericInput("inTreeHang", "Hanging of leaves:", 0.1)),
+		column(6, NULL)
+		),
+		actionButton("btnSubTreeHang", "Set Hang"),
 		actionButton("btnSubTreeHistory", "History"),
 	),
 	mainPanel(

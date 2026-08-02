@@ -16,17 +16,20 @@
 ### Plot Tree/SubTree
 #' @export
 plot.subtree = function(x, mark = TRUE, lwd = 3,
-		col = "#FF243680", adj = c(0.25)) {
+		col = "#FF243680", adj = c(0.25), hang = 0.1) {
 	node = attr(x, "N0");
 	lblN = paste0("Subtree: ", node);
 	# xPos:
 	xPos   = match(as.character(node), x$labels);
 	isNode = ! is.na(xPos);
 	height = max(x$height);
+	startH = min(x$height);
 	xPos   = which(x$order == xPos);
 	# Plot:
-	plot(x, xlab = lblN);
-	if(mark && isNode) lines(c(xPos, xPos) + adj, c(0, height),
+	plot(x, xlab = lblN, hang = hang);
+	if(mark && isNode)
+		lines(c(xPos, xPos) + adj,
+		c(startH - abs(hang) / 2  - 0.2, height),
 		lwd = 3, col = col);
 	invisible(c(xPos, height));
 }

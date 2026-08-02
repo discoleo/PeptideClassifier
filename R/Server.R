@@ -111,6 +111,7 @@ server.app = function(input, output, session) {
 		adjTreeHeight  = options$adjTreeHeight, # Remove Inversions
 		histSubTree    = list(), # History with SubTree-searches;
 		isTreeLoaded   = FALSE,  # Is it loaded from external data?
+		dHangSubTree   = 0.1,    # How much should Leaves hang;
 		# Clustering: Diagnostics
 		clustResultAll = NULL, # List with All Trees
 		clustBrRatios  = NULL, # Branch Ratios (all branches)
@@ -867,9 +868,12 @@ server.app = function(input, output, session) {
 		x = values$clustSubTree;
 		if(is.null(x)) return();
 		# Plot SubTree:
-		pos = plot.subtree(x);
+		pos = plot.subtree(x, hang = values$dHangSubTree);
 		print(pos);
 	});
+	observeEvent(input$btnSubTreeHang, {
+		values$dHangSubTree = input$inTreeHang;
+	})
 	
 	# Read Labels from Tree:
 	readFromTree = function(add.id = FALSE) {
