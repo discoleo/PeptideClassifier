@@ -60,12 +60,18 @@ panelClustering = function(img.height = 800) {
 		downloadButton("downloadTree", "Full Tree"),
 		# History & Other Settings:
 		fluidRow(
-		column(6,
-		numericInput("inTreeHang", "Hanging of leaves:", 0.1)),
-		column(6, NULL)
+		style = "padding-top:12px;",
+		column(5,
+		span("Hanging of leaves:",
+			style = "vertical-align:center; font-weight:bold")),
 		),
+		column(4,
+		numericInput("inTreeHang", label = NULL, 0.1)),
+		column(8,
 		actionButton("btnSubTreeHang", "Set Hang"),
 		actionButton("btnSubTreeHistory", "History"),
+		),
+		fluidRow(NBSP())
 	),
 	mainPanel(
 		plotOutput("imgTree", height = hImg),
