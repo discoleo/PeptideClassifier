@@ -30,6 +30,7 @@ server.app = function(input, output, session) {
 		# Topic Models:
 		seedTM    = NULL,  # Seed: 123
 		### Trees:
+		cluster.Ward.hpow  = 0.5, # Power of Height used for Ward method;
 		# Solitary Leaf vs L2-Leaf;
 		colTreeLeaves = c(L1 = "#FF886490", L2 = "#6432FFB8"),
 		adjTreeHeight = TRUE,  # Remove Inversions
@@ -787,11 +788,23 @@ server.app = function(input, output, session) {
 	})
 	
 	output$tblClusters = DT::renderDT({
+		# TODO
 		return(NULL);
 	})
 	output$imgTree = renderPlot({
 		hClust = values$clustResult;
 		if(is.null(hClust)) return();
+		# Adjust Height for Ward 1:
+		# - Theoretically: height = sqrt(...);
+		# - Looks/Behaves better even when clustering
+		#   was not computed using distance^2;
+		if(hClust$method == "ward.D") {
+			pow = options$cluster.Ward.hpow;
+			if(pow != 1) {
+				cat("Adjusting height!");
+				hClust$height = hClust$height^pow;
+			}
+		}
 		# Remove Inversions:
 		if(values$adjTreeHeight) {
 			hClust = adjust.height.hclust(hClust);
@@ -944,6 +957,9 @@ server.app = function(input, output, session) {
 		x = readRDS(ff$datapath);
 		values$clustResult  = x;
 		values$isTreeLoaded = TRUE;
+		# Some Diagnostics:
+		cat("Tree Method: ", x$method, "\n");
+		cat("Number of Leaves: ", length(x$height) + 1, "\n");
 	})
 	output$txtTreeWarnExt = renderText({
 		if(! values$isTreeLoaded) return("");
