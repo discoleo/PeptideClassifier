@@ -10,8 +10,13 @@
 ##
 ## draft v.0.2e
 
-style = function() {
-	"color:#F03232;";
+style = function(other = NULL) {
+	s = "color:#F03232;";
+	if(! is.null(other)) {
+		other = paste(other, collapse = ";");
+		s = paste(s, other);
+	};
+	return(s);
 }
 styleB = function() {
 	"color:#4432D8;weight:heavy;font-size:150%;";
@@ -66,6 +71,33 @@ panelTutorial_Linkage = function() {
 		style = "padding-left:20px;",
 		### Linkage Types:
 		h3("Linkage Type:"),
+		# Ward D1 & D2:
+		h3("Ward Method:", style = style()),
+		"The Ward method implemented initially in function hclust",
+		"requires the squaring of the dissimilarity matrix,",
+		"while the true node height is the square root of the computed height.",
+		fluidRow(
+			style = "padding-left:40px;",
+			"r.clust = hclust(dist(...)^2, method = \"ward.D\");"),
+		fluidRow(
+			style = "padding-left:40px;",
+			"r.clust$height = sqrt(r.clust$height);"),
+		"The R documentation lacks this information!",
+		"The above steps are performed automatically using the ward.D2 method.",
+		"The square-root of the height is now used to plot a tree generated with method ward.D,",
+		"in order to maintain a proper scaling for nodes close to the root.",
+		"The actual power can be set using the global option: cluster.Ward.hpow (see in Server.R).",
+		"Notice that the dissimilarity matrix is not squared!",
+		"Users are advised to use method ward.D2 if they want",
+		"the correct minimal-variance partitioning.",
+		fluidRow(
+		style = "padding-left:20px;",
+		span("Note:", style = style()),
+		"Ward method tends to produce very homogenous clusters,",
+		  "which may NOT reflect real-life data sets.",
+		"Other linkage methods, like complete linkage,",
+		  "may create more realistic partitions (for this project).",
+		),
 		# McQuitty:
 		h3("McQuitty Method:", style = style()),
 		"Around half of the leaves join other leaves to form a micro-cluster.",
