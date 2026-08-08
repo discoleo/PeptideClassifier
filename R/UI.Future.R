@@ -54,7 +54,7 @@ panelTutorial = function() {
 		h4("Unbalanced Trees", style = styleB2()),
 		"In some types of trees, a single macro-cluster increases steadily in size: such clusters are not useful for the current project.",
 	);
-	c(rowUI,
+	tagList(rowUI,
 		panelTutorial_Linkage(),
 		panelTutorial_Shortcomings());
 }
@@ -120,7 +120,9 @@ panelTODO = function() {
 	b = function(x) tag("b", x);
 	# UI:
 	fluidRow(
-		h2("Clustering Methods"),
+		style = "padding-left:20px;",
+		### Clustering:
+		h2("Clustering Methods", style = style()),
 		"Implement additional robust methods",
 		h3("Robust Single Linkage"),
 		b("Weighted Single Linkage: "),
@@ -130,6 +132,34 @@ panelTODO = function() {
 		b("Combined Single & Complete Linkage: "),
 		"combine the single linkage with the complete linkage and use the sum between the 2 distances.",
 		"The maximum distance will counteract the effect of a single pair of very close points.",
+		### Features
+		h2("Peptides & Features", style = style()),
+		### PTM:
+		h3("Post-Translational Modifications of Amino Acids", style = styleB()),
+		"Natural peptides contain many post-translational modifications (PTM).",
+		"Currently, only the 20 standard amino acids are permitted and used to compute the features.",
+		"However, various modifications are common in nature:",
+		tags$ul(
+		tag("li", "C-terminal amidation;"),
+		tag("li", "Hydroxy-proline;"),
+		tag("li", "Gamma-carboxy-glutamate;"),
+		tag("li", "N-terminal cyclization (pyrD);"),
+		tag("li", "Sulfation of tyrosines;"),
+		),
+		"Such modifications can still be represented with 1 letter codes",
+		"and could easily be incorporated into the application.",
+		### Disulphide Bonds:
+		h3("Disulphide Bonds", style = styleB()),
+		"Small peptides usually lack a defined secondary and tertiary structure.",
+		"Conversely, disulphide bonds are covalent bonds which can convey rigidity to a structure.",
+		"Many conotoxins and spider venoms have one or more such disulphide bonds.",
+		"Incorporating these structural details as chemical features",
+		"will be quite challenging.",
+		### Cyclic Peptides:
+		h3("Cyclic Peptides", style = styleB()),
+		"Some of the natural peptides are cyclic.",
+		"This may require an update to the algorithm which generates the n-grams.",
+		"The current application may be easily adapted to accommodate in part such peptides as well.",
 		NBSP()
 	)
 }
