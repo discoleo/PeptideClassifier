@@ -35,6 +35,9 @@ server.app = function(input, output, session) {
 		colTreeLeaves = c(L1 = "#FF886490", L2 = "#6432FFB8"),
 		adjTreeHeight = TRUE,  # Remove Inversions
 		sizeHist_SubTree = 5,  # Size of Search-History
+		tree.dx_hist = list(
+			cex = list(main = 1.5, axis = 1.3, lab = 1.4), # CEX
+			NULL),
 		# TODO
 		NULL
 	);
@@ -1098,14 +1101,24 @@ server.app = function(input, output, session) {
 		x = values$clustResultAll;
 		if(is.null(x) || length(x) == 0) return();
 		LEN  = length(x);
-		nCol = ceiling(LEN / 2);
-		nRow = if(LEN == 1) 1 else 2;
+		isR1 = (LEN <= 2); # 1 Row vs 2 Rows;
+		nCol = if(isR1) LEN else ceiling(LEN / 2);
+		nRow = if(isR1) 1 else 2;
 		par.old = par(mfrow = c(nRow, nCol));
 		on.exit(par(par.old));
 		#
+		xlab = if(isR1) "Branch Ratio" else NULL;
+		isR2 = ! isR1;
+		# Options:
+		cex.all  = options$tree.dx_hist$cex;
+		cex.main = cex.all$main;
+		cex.axis = cex.all$axis;
+		cex.lab  = cex.all$lab;
 		for(id in seq(LEN)) {
 			rBr = branch.ratios(x[[id]]);
-			hist(rBr, main = names(x)[[id]], xlab = "Branch Ratio");
+			if(isR2) par(mar = c(2.5,4,2.5,1.5) + 0.1);
+			hist(rBr, main = names(x)[[id]], xlab = xlab,
+				cex.main=cex.main, cex.axis=cex.axis, cex.lab=cex.lab);
 		}
 	})
 	
