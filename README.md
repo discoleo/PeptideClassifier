@@ -15,6 +15,11 @@ The main purpose of this package is to facilitate the exploration of sets of pep
 - Browse and cluster the peptides;
 - Visualise and explore the clusters;
 
+For more detailed information, see the file MasterThesis_LMada_2026_Revised_v1.1.pdf in the PeptideClassifierDoc repository.
+> https://github.com/discoleo/PeptideClassifierDoc
+
+A brief overview of the workflow is described below.
+
 ### DTM Tab
 The peptides are split into various n-Grams. Users can select these features under the **DTM** tab. This tab includes also the controls to construct a DocumentTermMatrix, which will be used during the subsequent steps.
 
